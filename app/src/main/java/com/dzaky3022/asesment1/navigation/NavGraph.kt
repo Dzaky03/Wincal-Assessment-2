@@ -16,6 +16,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.dzaky3022.asesment1.navigate
 import com.dzaky3022.asesment1.ui.component.animating.WaterLevelState
+import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText
+import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams
 import com.dzaky3022.asesment1.ui.screen.DashboardScreen
 import com.dzaky3022.asesment1.ui.screen.FormScreen
 import com.dzaky3022.asesment1.ui.screen.VisualScreen
@@ -32,7 +34,7 @@ fun NavGraph() {
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Dashboard.route,
+        startDestination = Screen.Form.route,
     ) {
         composable(Screen.Dashboard.route) {
             DashboardScreen(
@@ -40,13 +42,16 @@ fun NavGraph() {
             )
         }
         composable(Screen.Form.route) {
-            FormScreen()
+            FormScreen(
+                navController = navController,
+            )
         }
         composable(Screen.Visual.route) {
             VisualScreen(
                 modifier = Modifier,
                 waveDurationInMills = 3000L,
                 waterLevelState = waterLevelState,
+                navController = navController,
                 onWavesClick = {
                     waterLevelState =
                         if (waterLevelState == WaterLevelState.Animating) {
@@ -55,11 +60,8 @@ fun NavGraph() {
                             WaterLevelState.Animating
                         }
                 },
-                onBackPressed = {
-                    navigate(navController, Screen.Dashboard.route)
-                }
             ) {
-                com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText(
+                WaterDropText(
                     modifier = Modifier,
                     align = Alignment.Center,
                     textStyle = TextStyle(
@@ -68,7 +70,7 @@ fun NavGraph() {
                         fontWeight = FontWeight.Bold,
                         fontFamily = Poppins,
                     ),
-                    waveParams = com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams(
+                    waveParams = WaveParams(
                         pointsQuantity = points,
                         maxWaveHeight = 30f
                     )

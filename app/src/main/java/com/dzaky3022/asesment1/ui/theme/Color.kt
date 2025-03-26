@@ -13,6 +13,8 @@ val Water = Color(0xff58e2ff)
 val Blue = Color(0xFF3289a7)
 val Background = Color(0xFFf9f8f8)
 val Gray = Color(0xFFACACAC)
+val IconBackgroundGray = Color(0xFFDDE4EC)
+val Danger = Color(0xFFFF0000)
 
 
 val BackgroundDark = Color(0xFF050D10)

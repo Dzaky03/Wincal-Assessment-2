@@ -35,11 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.navigate
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Water
+import com.dzaky3022.asesment1.R
 
 @Composable
 fun DashboardScreen(
@@ -51,7 +51,8 @@ fun DashboardScreen(
     var isPressed2 by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = BackgroundDark
+        modifier = modifier,
+        containerColor = BackgroundDark,
     ) {
         Column(
             modifier = Modifier
@@ -76,25 +77,27 @@ fun DashboardScreen(
                     color = Color.White.copy(alpha = .7f)
                 )
             }
-                Image(
-                    modifier = Modifier
-                        .size(250.dp)
-                        .offset(y = (-30).dp)
-                        .align(Alignment.CenterHorizontally)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onPress = {
-                                    isPressed2 = true
-                                    awaitRelease()
-                                    isPressed2 = false
-                                }
-                            )
-                        }
-                    ,
-                    painter = painterResource(id = R.drawable.app_logo_2),
-                    contentDescription = "App Logo",
-                    colorFilter = ColorFilter.tint(color = if (isPressed2) Color.White else Water , blendMode = BlendMode.SrcIn)
+            Image(
+                modifier = Modifier
+                    .size(250.dp)
+                    .offset(y = (-30).dp)
+                    .align(Alignment.CenterHorizontally)
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onPress = {
+                                isPressed2 = true
+                                awaitRelease()
+                                isPressed2 = false
+                            }
+                        )
+                    },
+                painter = painterResource(id = R.drawable.app_logo_2),
+                contentDescription = "App Logo",
+                colorFilter = ColorFilter.tint(
+                    color = if (isPressed2) Color.White else Water,
+                    blendMode = BlendMode.SrcIn
                 )
+            )
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),

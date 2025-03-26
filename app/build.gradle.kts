@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.dzaky3022.wincal"
+    namespace = "com.dzaky3022.asesment1"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.dzaky3022.wincal"
+        applicationId = "com.dzaky3022.asesment1"
         minSdk = 23
         targetSdk = 34
         versionCode = 1

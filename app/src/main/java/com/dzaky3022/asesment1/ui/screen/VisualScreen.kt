@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,26 +41,33 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.dzaky3022.asesment1.navigate
+import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.animating.WaterLevelState
 import com.dzaky3022.asesment1.ui.component.animating.waveProgressAsState
-import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.ui.component.waterdrops.canvas.drawTextWithBlendMode
 import com.dzaky3022.asesment1.ui.component.waterdrops.canvas.drawWaves
 import com.dzaky3022.asesment1.ui.component.waterdrops.createLevelAsState
 import com.dzaky3022.asesment1.ui.component.waterdrops.createPathsAsState
 import com.dzaky3022.asesment1.ui.component.waterdrops.rememberDropWaterDuration
 import com.dzaky3022.asesment1.ui.component.waterdrops.text.createTextParamsAsState
+import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText
+import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams
 import com.dzaky3022.asesment1.ui.component.waterdrops.wave.createAnimationsAsState
+import com.dzaky3022.asesment1.ui.theme.Background
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.Water
 
 @Composable
 fun VisualScreen(
     modifier: Modifier = Modifier,
     waveDurationInMills: Long = 6000L,
     waterLevelState: WaterLevelState,
+    navController: NavHostController,
     onWavesClick: () -> Unit,
-    onBackPressed: () -> Unit,
-    content: () -> com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText,
+    content: () -> WaterDropText,
 ) {
     val waveParams = remember { content().waveParams }
     val animations = createAnimationsAsState(pointsQuantity = waveParams.pointsQuantity)
@@ -71,8 +77,8 @@ fun VisualScreen(
         waveParams = waveParams,
         animations = animations,
         waterLevelState = waterLevelState,
+        navController = navController,
         onWavesClick = onWavesClick,
-        onBackPressed = onBackPressed,
         content = content,
     )
 }
@@ -84,8 +90,8 @@ fun WaterLevelDrawing(
     waveParams: com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams,
     animations: MutableList<State<Float>>,
     waterLevelState: WaterLevelState,
+    navController: NavHostController,
     onWavesClick: () -> Unit,
-    onBackPressed: () -> Unit,
     content: () -> com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText,
 ) {
     val waveDuration by rememberSaveable { mutableLongStateOf(waveDurationInMills) }
@@ -99,8 +105,8 @@ fun WaterLevelDrawing(
         animations = animations,
         waveProgress = waveProgress,
         waveParams = waveParams,
+        navController = navController,
         onWavesClick = onWavesClick,
-        onBackPressed = onBackPressed,
         content = content,
     )
 }
@@ -110,12 +116,12 @@ fun WaterLevelDrawing(
 fun WavesDrawing(
     modifier: Modifier = Modifier,
     waveDuration: Long,
-    waveParams: com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams,
+    waveParams: WaveParams,
     animations: MutableList<State<Float>>,
     waveProgress: Float,
+    navController: NavHostController,
     onWavesClick: () -> Unit,
-    onBackPressed: () -> Unit,
-    content: () -> com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText,
+    content: () -> WaterDropText,
 ) {
     val elementParams by remember { mutableStateOf(ElementParams()) }
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
@@ -154,14 +160,15 @@ fun WavesDrawing(
         elementParams = elementParams
     )
 
-    var expanded by remember { mutableStateOf(false) }
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = onBackPressed
+                        onClick = {
+                            navigate(navController, Screen.Dashboard.route)
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBackIosNew,
@@ -182,23 +189,6 @@ fun WavesDrawing(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Water),
-                actions = {
-                    IconButton(
-                        onClick = { expanded = !expanded }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More Options",
-                            tint = Color.Unspecified
-                        )
-                    }
-                    MoreMenu(
-                        expanded = expanded,
-                        onDismiss = {
-                            expanded = false
-                        },
-                    );
-                }
             )
         },
         content = { paddingValues ->
@@ -259,18 +249,19 @@ fun MoreMenu(
     onDismiss: () -> Unit = {},
 ) {
     DropdownMenu(
+        modifier = modifier.background(Background),
         expanded = expanded,
         onDismissRequest = onDismiss,
     ) {
         DropdownMenuItem(
-            text = { Text("Add") },
+            text = { Text("Add", fontSize = 15.sp) },
             onClick = {
                 onAdd()
                 onDismiss()
             }
         )
         DropdownMenuItem(
-            text = { Text("Share") },
+            text = { Text("Share", fontSize = 15.sp) },
             onClick = {
                 onShare()
                 onDismiss()

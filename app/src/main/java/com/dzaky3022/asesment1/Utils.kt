@@ -1,5 +1,7 @@
 package com.dzaky3022.asesment1
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
@@ -88,5 +90,15 @@ fun navigate(
         }
         this.launchSingleTop = launchSingleTop
         this.restoreState = restoreState
+    }
+}
+
+fun shareData(context: Context, message: String) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, message)
+    }
+    if (shareIntent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(shareIntent)
     }
 }

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">WinCal</string>
     <string name="button_start">Start</string>
+    <string name="share_template">Room Temperature: %1$s cm\nWeight: %2$s cm\nActivity Level: %3$.0f\Water Intake Needed Today:%4$.0f</string>
 </resources>
