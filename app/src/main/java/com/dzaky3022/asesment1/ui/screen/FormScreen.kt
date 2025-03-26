@@ -30,6 +30,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonColors
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -46,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -58,12 +61,12 @@ import com.dzaky3022.asesment1.ui.theme.Background
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Danger
 import com.dzaky3022.asesment1.ui.theme.IconBackgroundGray
-import com.dzaky3022.asesment1.ui.theme.Water
+import kotlin.math.roundToInt
 
-enum class ActivityLevel(val value: String) {
-    Low("Sedentary"),
-    Medium("Light Exercise"),
-    High("Heavy Exercise");
+enum class ActivityLevel(val label: String, val value: Double) {
+    Low("Sedentary", 35.0),
+    Medium("Light Exercise", 40.0),
+    High("Heavy Exercise", 45.0);
 }
 
 enum class TempUnit(val value: String, val symbol: String) {
@@ -93,11 +96,12 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
     val context = LocalContext.current
     var weight by remember { mutableStateOf("") }
     var weightUnit by remember { mutableStateOf(WeightUnit.Kilogram) }
-    var roomTemp by remember { mutableStateOf("") }
-    var roomTempUnit by remember { mutableStateOf(TempUnit.Celsius) }
+    var temp by remember { mutableStateOf("") }
+    var tempUnit by remember { mutableStateOf(TempUnit.Celsius) }
     var activityLevel by remember { mutableStateOf(ActivityLevel.Low) }
     var gender by remember { mutableStateOf(Gender.Male) }
     var expanded by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf("") }
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
@@ -185,19 +189,19 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                 isRequired = true,
                 label = "Room Temperature",
                 hint = "Enter your Room Temperature",
-                initialValue = roomTemp,
-                onChange = { roomTemp = it },
+                initialValue = temp,
+                onChange = { temp = it },
                 suffixIcon = {
-                    Text(roomTempUnit.symbol, color = Color.Gray)
+                    Text(tempUnit.symbol, color = Color.Gray)
                 }
             )
             Spacer(Modifier.height(10.dp))
             RadioButtonGroup(
                 label = "Temperature Unit",
                 options = TempUnit.entries,
-                selectedOption = roomTempUnit,
+                selectedOption = tempUnit,
                 onOptionSelected = {
-                    roomTempUnit = it
+                    tempUnit = it
                 }
             )
             Spacer(Modifier.height(8.dp))
@@ -243,8 +247,21 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                 horizontalArrangement = Arrangement.Center,
             ) {
                 Button(
+                    enabled = weight.isNotEmpty() && temp.isNotEmpty(),
                     modifier = Modifier.weight(1f),
-                    onClick = {},
+                    onClick = {
+                        result =
+                            "Result: ${
+                                calculateWaterIntake(
+                                    weight.toDouble(),
+                                    temp.toDouble(),
+                                    gender,
+                                    tempUnit,
+                                    weightUnit,
+                                    activityLevel
+                                ).roundToInt()
+                            }"
+                    },
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = if (isPressed) Color.White else BackgroundDark,
@@ -252,9 +269,25 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                     interactionSource = interactionSource,
                     border = BorderStroke(1.dp, BackgroundDark)
                 ) {
-                    Text("Calculate", fontSize = 16.sp, color = if (isPressed) BackgroundDark else Color.White, modifier = Modifier.padding(vertical = 4.dp))
+                    Text(
+                        "Calculate",
+                        fontSize = 16.sp,
+                        color = if (isPressed) BackgroundDark else Color.White,
+                        modifier = Modifier.padding(vertical = 4.dp),
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 }
             }
+            Spacer(Modifier.height(8.dp))
+            if (result.isNotEmpty())
+                Text(
+                    text = "$result ml",
+                    fontSize = 16.sp,
+                    color = BackgroundDark,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
+                )
         }
     }
 }
@@ -301,7 +334,8 @@ private fun <T> RadioButtonGroup(
                     ) {
                         RadioButton(
                             selected = (option == selectedOption),
-                            onClick = { onOptionSelected(option) }
+                            onClick = { onOptionSelected(option) },
+                            colors = RadioButtonDefaults.colors(selectedColor = BackgroundDark)
                         )
                         Text(
                             text = option.toString(),
@@ -324,7 +358,8 @@ private fun <T> RadioButtonGroup(
                 ) {
                     RadioButton(
                         selected = (option == selectedOption),
-                        onClick = { onOptionSelected(option) }
+                        onClick = { onOptionSelected(option) },
+                        colors = RadioButtonDefaults.colors(selectedColor = BackgroundDark)
                     )
                     Text(
                         text = option.toString(),
@@ -332,5 +367,47 @@ private fun <T> RadioButtonGroup(
                     )
                 }
             }
+    }
+}
+
+
+private fun calculateWaterIntake(
+    weight: Double,
+    temp: Double,
+    gender: Gender,
+    tempUnit: TempUnit,
+    weightUnit: WeightUnit,
+    activityLevel: ActivityLevel,
+): Double {
+    return calculateWeight(weight, weightUnit) * activityLevel.value * (1 + calculateClimate(
+        temp,
+        tempUnit
+    )) * (1 + calculateGender(gender))
+}
+
+private fun calculateWeight(weight: Double, unit: WeightUnit): Double {
+    return when (unit) {
+        WeightUnit.Pound -> weight / 2.205
+        else -> weight
+    }
+}
+
+private fun calculateClimate(temp: Double, unit: TempUnit): Double {
+    val celsiusTemp = when (unit) {
+        TempUnit.Fahrenheit -> (temp - 32) / 1.8
+        TempUnit.Kelvin -> temp - 273.15
+        else -> temp
+    }
+    return when {
+        celsiusTemp < 15.0 -> -(5 / 100.0)
+        celsiusTemp in 15.0..30.0 -> 0.0
+        else -> 10 / 100.0
+    }
+}
+
+fun calculateGender(gender: Gender): Double {
+    return when (gender) {
+        Gender.Male -> 10 / 100.0
+        Gender.Female -> 0.0
     }
 }
