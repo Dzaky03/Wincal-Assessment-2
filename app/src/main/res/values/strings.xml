@@ -3,7 +3,7 @@
     <string name="button_start">Start</string>
     <string name="share_template">Room Temperature: %1$.2f Weight: %2$.2f Activity Level: %3$s Water Intake Needed Today: %4$.2f ml Drink Taken vs Needed: %5$.2f%% Gender: %6$s</string>
     <string name="tap_to_go_back">Tap to go back...</string>
-    <string name="share_title">Share result to your friend by using menu button on top right corner menu!</string>
+    <string name="share_title">Share result to your friend by using menu button on top right corner!</string>
     <string name="goal_achieved">Goal Achieved! 🥳🎉</string>
     <string name="almost">Almost there! Just a bit more 💧</string>
     <string name="half">You\'re halfway there! Keep it up 💪</string>
