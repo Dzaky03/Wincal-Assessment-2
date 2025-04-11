@@ -1,14 +1,17 @@
-package com.dzaky3022.asesment1
+package com.dzaky3022.asesment1.utils
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
+import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.screen.ElementParams
+import java.io.File
 import kotlin.math.pow
 
 fun isAboveElement(waterLevel: Int, bufferY: Float, position: Offset) =
@@ -93,12 +96,18 @@ fun navigate(
     }
 }
 
-fun shareData(context: Context, message: String) {
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, message)
+fun shareData(context: Context, bitmap: Bitmap, caption: String) {
+    val file = File(context.cacheDir, "screenshot.png")
+    file.outputStream().use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+
+    val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+
+    val shareIntent = Intent().apply {
+        action = Intent.ACTION_SEND
+        putExtra(Intent.EXTRA_STREAM, uri)
+        putExtra(Intent.EXTRA_TEXT, caption)
+        type = "image/png"
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
-    if (shareIntent.resolveActivity(context.packageManager) != null) {
-        context.startActivity(shareIntent)
-    }
+    context.startActivity(Intent.createChooser(shareIntent, "Share Screenshot"))
 }

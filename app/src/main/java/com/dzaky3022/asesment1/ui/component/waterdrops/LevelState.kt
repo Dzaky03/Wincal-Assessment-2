@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import com.dzaky3022.asesment1.isAboveElement
-import com.dzaky3022.asesment1.atElementLevel
-import com.dzaky3022.asesment1.isWaterFalls
+import com.dzaky3022.asesment1.utils.isAboveElement
+import com.dzaky3022.asesment1.utils.atElementLevel
+import com.dzaky3022.asesment1.utils.isWaterFalls
 import com.dzaky3022.asesment1.ui.screen.ElementParams
 
 @Composable

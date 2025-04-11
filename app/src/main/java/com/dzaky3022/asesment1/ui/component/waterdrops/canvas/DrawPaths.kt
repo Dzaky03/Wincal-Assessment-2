@@ -6,32 +6,57 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.drawText
-import com.dzaky3022.asesment1.ui.theme.Blue
-import com.dzaky3022.asesment1.ui.theme.Water
+import androidx.compose.ui.unit.sp
+import com.dzaky3022.asesment1.ui.theme.*
 import com.dzaky3022.asesment1.ui.screen.Paths
 import com.dzaky3022.asesment1.ui.component.waterdrops.text.TextParams
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 
 fun DrawScope.drawWaves(
     paths: Paths,
+    waveProgress: Float? = 0f,
 ) {
+    val progress = waveProgress ?: 0f
+
+    val bgColor = when {
+        progress >= 1f -> FadeBlue
+        progress > 0.75f -> lerp(FadeGreen, FadeBlue, (progress - 0.75f) / 0.25f)
+        progress > 0.5f -> lerp(FadeYellow, FadeGreen, (progress - 0.5f) / 0.25f)
+        else -> lerp(FadeRed, FadeYellow, progress / 0.5f)
+    }
+
+    val fgColor = when {
+        progress >= 1f -> Water
+        progress > 0.75f -> lerp(Success, Water, (progress - 0.75f) / 0.25f)
+        progress > 0.5f -> lerp(Warning, Success, (progress - 0.5f) / 0.25f)
+        else -> lerp(Danger, Warning, progress / 0.5f)
+    }
+
     drawIntoCanvas {
         it.drawPath(paths.pathList[1], paint.apply {
-            color = Blue
+            color = bgColor
         })
         it.drawPath(paths.pathList[0], paint.apply {
-            color = Water
+            color = fgColor
         })
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
+
 fun DrawScope.drawTextWithBlendMode(
     mask: Path,
     textParams: TextParams,
 ) {
+
+    drawText(
+        textMeasurer = textParams.textMeasurer,
+        topLeft = textParams.textOffset.copy(y = textParams.textOffset.y - 50),
+        text = "That's about...",
+        style = textParams.textStyle.copy(fontSize = 20.sp)
+    )
     drawText(
         textMeasurer = textParams.textMeasurer,
         topLeft = textParams.textOffset,
@@ -41,10 +66,21 @@ fun DrawScope.drawTextWithBlendMode(
     drawText(
         textMeasurer = textParams.textMeasurer,
         topLeft = textParams.unitTextOffset,
-        text = "FT",
+        text = "%",
         style = textParams.unitTextStyle,
     )
-
+    drawText(
+        textMeasurer = textParams.textMeasurer,
+        topLeft = textParams.textOffset.copy(y = textParams.textOffset.y + 250),
+        text = "Out of your recommended amount.",
+        style = textParams.textStyle.copy(fontSize = 16.sp)
+    )
+    drawText(
+        textMeasurer = textParams.textMeasurer,
+        topLeft = textParams.textOffset.copy(y = textParams.textOffset.y + 450),
+        text = "Tap to continue...",
+        style = textParams.textStyle.copy(fontSize = 16.sp)
+    )
     drawPath(
         path = mask,
         color = BackgroundDark,
@@ -53,6 +89,6 @@ fun DrawScope.drawTextWithBlendMode(
 }
 
 val paint = Paint().apply {
-    this.color = Blue
+    this.color = FadeBlue
     pathEffect = PathEffect.cornerPathEffect(100f)
 }

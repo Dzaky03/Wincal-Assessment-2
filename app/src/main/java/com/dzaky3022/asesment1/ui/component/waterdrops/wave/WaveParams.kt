@@ -11,7 +11,7 @@ data class WaterDropText(
     val modifier: Modifier = Modifier,
     val align: Alignment,
     val textStyle: TextStyle,
-    val waveParams: com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams
+    val waveParams: WaveParams
 )
 
 @Stable

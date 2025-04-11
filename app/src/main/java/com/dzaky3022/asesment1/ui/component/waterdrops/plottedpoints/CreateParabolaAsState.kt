@@ -11,8 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
-import com.dzaky3022.asesment1.Parabola
-import com.dzaky3022.asesment1.PointF
+import com.dzaky3022.asesment1.utils.Parabola
+import com.dzaky3022.asesment1.utils.PointF
 import com.dzaky3022.asesment1.ui.component.waterdrops.LevelState
 
 @Composable

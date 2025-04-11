@@ -5,8 +5,8 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntSize
-import com.dzaky3022.asesment1.Parabola
-import com.dzaky3022.asesment1.PointF
+import com.dzaky3022.asesment1.utils.Parabola
+import com.dzaky3022.asesment1.utils.PointF
 
 @Composable
 fun createPlottedPointsAsState(

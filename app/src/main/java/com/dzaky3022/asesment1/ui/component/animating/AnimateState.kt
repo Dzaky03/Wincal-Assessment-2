@@ -18,22 +18,22 @@ enum class WaterLevelState {
 @Composable
 fun waveProgressAsState(
     timerState: WaterLevelState,
+    percentage: Float? = 0f,
     timerDurationInMillis: Long
 ): State<Float> {
     val animatable = remember { Animatable(initialValue = 0f) }
-
     LaunchedEffect(timerState) {
         when (timerState) {
             WaterLevelState.StartReady -> {
                 animatable.animateTo(
-                    targetValue = 0.0f,
+                    targetValue = 0f,
                     animationSpec = spring(stiffness = 100f)
                 )
             }
 
             WaterLevelState.Animating -> {
                 animatable.animateTo(
-                    targetValue = .486f,
+                    targetValue = percentage!!/100,
                     animationSpec = tween(
                         durationMillis = timerDurationInMillis.toInt(),
                         easing = LinearEasing

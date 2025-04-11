@@ -1,6 +1,13 @@
 package com.dzaky3022.asesment1.ui.screen
 
+import android.widget.Toast
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -19,9 +26,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,84 +37,72 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonColors
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
-import com.dzaky3022.asesment1.navigate
 import com.dzaky3022.asesment1.navigation.Screen
-import com.dzaky3022.asesment1.shareData
 import com.dzaky3022.asesment1.ui.component.CustomInput
-import com.dzaky3022.asesment1.ui.theme.Background
+import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Danger
+import com.dzaky3022.asesment1.ui.theme.Gray
 import com.dzaky3022.asesment1.ui.theme.IconBackgroundGray
-import kotlin.math.roundToInt
+import com.dzaky3022.asesment1.utils.Enums.*
+import java.math.RoundingMode
 
-enum class ActivityLevel(val label: String, val value: Double) {
-    Low("Sedentary", 35.0),
-    Medium("Light Exercise", 40.0),
-    High("Heavy Exercise", 45.0);
-}
-
-enum class TempUnit(val value: String, val symbol: String) {
-    Celsius("Celsius", "°C"),
-    Fahrenheit("Fahrenheit", "°F"),
-    Kelvin("Kelvin", "K");
-}
-
-enum class WeightUnit(val value: String, val symbol: String) {
-    Kilogram("Kilogram", "kg"),
-    Pound("Pound", "lbs"),
-}
-
-enum class Gender(val value: String) {
-    Male("Male"),
-    Female("Female"),
-}
-
-enum class Direction {
-    Horizontal,
-    Vertical,
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) {
     val context = LocalContext.current
-    var weight by remember { mutableStateOf("") }
-    var weightUnit by remember { mutableStateOf(WeightUnit.Kilogram) }
-    var temp by remember { mutableStateOf("") }
-    var tempUnit by remember { mutableStateOf(TempUnit.Celsius) }
-    var activityLevel by remember { mutableStateOf(ActivityLevel.Low) }
-    var gender by remember { mutableStateOf(Gender.Male) }
-    var expanded by remember { mutableStateOf(false) }
-    var result by remember { mutableStateOf("") }
+    var weight by rememberSaveable { mutableStateOf("") }
+    var weightUnit by rememberSaveable { mutableStateOf(WeightUnit.Kilogram) }
+    var temp by rememberSaveable { mutableStateOf("") }
+    var tempUnit by rememberSaveable { mutableStateOf(TempUnit.Celsius) }
+    var activityLevel by rememberSaveable { mutableStateOf(ActivityLevel.Low) }
+    var gender by rememberSaveable { mutableStateOf(Gender.Male) }
+    var isEnabled by rememberSaveable { mutableStateOf(false) }
+    var drinkAmount by rememberSaveable { mutableStateOf("") }
+    var waterUnit by rememberSaveable { mutableStateOf(WaterUnit.ml) }
+    var isNext by rememberSaveable { mutableStateOf(false) }
+
 
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
+
+    LaunchedEffect(isNext, weight, temp, drinkAmount) {
+        isEnabled = if (isNext) {
+            weight.isNotEmpty() && temp.isNotEmpty()
+        } else {
+            drinkAmount.isNotEmpty()
+        }
+    }
+
     Scaffold(
         modifier = modifier,
-        containerColor = Background,
+        containerColor = BackgroundLight,
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -121,7 +116,12 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                     ) {
                         IconButton(
                             colors = IconButtonDefaults.iconButtonColors(containerColor = Color.Transparent),
-                            onClick = { navController.popBackStack() }
+                            onClick = {
+                                if (isNext)
+                                    isNext = false
+                                else
+                                    navController.popBackStack()
+                            }
                         ) {
                             Icon(
                                 modifier = Modifier.size(20.dp),
@@ -139,155 +139,183 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                     ) {
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
-                            text = "Add New Nutrition",
+                            text = "Water intake Calculator",
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
                         )
                     }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { expanded = !expanded }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More Options",
-                            tint = Color.Unspecified
-                        )
-                    }
-                    MoreMenu(
-                        expanded = expanded,
-                        onDismiss = {
-                            expanded = false
-                        },
-                        onAdd = {
-                            navigate(navController, Screen.Form.route)
-                        },
-                        onShare = {
-                            shareData(context, context.getString(R.string.share_template))
-                        },
-                    );
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
             )
         },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .padding(vertical = 24.dp, horizontal = 16.dp)
-                .fillMaxSize()
-        ) {
-            RadioButtonGroup(
-                label = "Activity Level",
-                options = ActivityLevel.entries,
-                selectedOption = activityLevel,
-                onOptionSelected = {
-                    activityLevel = it
-                }
-            )
-            CustomInput(
-                isRequired = true,
-                label = "Room Temperature",
-                hint = "Enter your Room Temperature",
-                initialValue = temp,
-                onChange = { temp = it },
-                suffixIcon = {
-                    Text(tempUnit.symbol, color = Color.Gray)
-                }
-            )
-            Spacer(Modifier.height(10.dp))
-            RadioButtonGroup(
-                label = "Temperature Unit",
-                options = TempUnit.entries,
-                selectedOption = tempUnit,
-                onOptionSelected = {
-                    tempUnit = it
-                }
-            )
-            Spacer(Modifier.height(8.dp))
-            CustomInput(
-                isRequired = true,
-                label = "Weight",
-                hint = "Enter your Weight",
-                initialValue = weight,
-                onChange = { weight = it },
-                suffixIcon = {
-                    Text(weightUnit.symbol, color = Color.Gray)
-                }
-            )
-            Spacer(Modifier.height(10.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                RadioButtonGroup(
-                    label = "Gender",
-                    direction = Direction.Vertical,
-                    options = Gender.entries,
-                    selectedOption = gender,
-                    onOptionSelected = {
-                        gender = it
-                    }
+        AnimatedContent(
+            targetState = isNext,
+            transitionSpec = {
+                slideInVertically(
+                    initialOffsetY = { fullWidth -> if (targetState) fullWidth else -fullWidth },
+                    animationSpec = tween(500)
+                ) togetherWith slideOutVertically(
+                    targetOffsetY = { fullWidth -> if (targetState) -fullWidth else fullWidth },
+                    animationSpec = tween(850)
                 )
-                Spacer(Modifier.width(24.dp))
-                RadioButtonGroup(
-                    label = "Weight Unit",
-                    direction = Direction.Vertical,
-                    options = WeightUnit.entries,
-                    selectedOption = weightUnit,
-                    onOptionSelected = {
-                        weightUnit = it
+            },
+            label = "AnimatedContent"
+        ) { targetState ->
+            if (targetState)
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(vertical = 24.dp, horizontal = 16.dp)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column {
+                        CustomInput(
+                            isRequired = true,
+                            isDigitOnly = true,
+                            label = "Room Temperature",
+                            hint = "Enter your Room Temperature",
+                            initialValue = temp,
+                            onChange = { temp = it },
+                            isSuffixDropdown = true,
+                            options = TempUnit.entries,
+                            selectedOption = tempUnit,
+                            optionLabel = { it?.symbol ?: "-" },
+                            onOptionSelected = { unit -> if (unit != null) tempUnit = unit }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        CustomInput(
+                            imeAction = ImeAction.Done,
+                            isRequired = true,
+                            isDigitOnly = true,
+                            label = "Weight",
+                            hint = "Enter your Weight",
+                            initialValue = weight,
+                            onChange = { weight = it },
+                            isSuffixDropdown = true,
+                            options = WeightUnit.entries,
+                            selectedOption = weightUnit,
+                            optionLabel = { it?.symbol ?: "-" },
+                            onOptionSelected = { unit -> if (unit != null) weightUnit = unit }
+                        )
+                        Spacer(Modifier.height(10.dp))
+                        RadioButtonGroup(
+                            label = "Activity/Exercise Level",
+                            options = ActivityLevel.entries,
+                            selectedOption = activityLevel,
+                            onOptionSelected = { activityLevel = it }
+                        )
+                        RadioButtonGroup(
+                            label = "Gender",
+                            direction = Direction.Horizontal,
+                            options = Gender.entries,
+                            selectedOption = gender,
+                            onOptionSelected = { gender = it }
+                        )
                     }
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                Button(
-                    enabled = weight.isNotEmpty() && temp.isNotEmpty(),
-                    modifier = Modifier.weight(1f),
-                    onClick = {
-                        result =
-                            "Result: ${
-                                calculateWaterIntake(
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Button(
+                            enabled = isEnabled,
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                val value = calculateWaterIntake(
                                     weight.toDouble(),
                                     temp.toDouble(),
                                     gender,
                                     tempUnit,
                                     weightUnit,
                                     activityLevel
-                                ).roundToInt()
-                            }"
-                    },
-                    shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = if (isPressed) Color.White else BackgroundDark,
-                    ),
-                    interactionSource = interactionSource,
-                    border = BorderStroke(1.dp, BackgroundDark)
-                ) {
-                    Text(
-                        "Calculate",
-                        fontSize = 16.sp,
-                        color = if (isPressed) BackgroundDark else Color.White,
-                        modifier = Modifier.padding(vertical = 4.dp),
-                        fontWeight = FontWeight.SemiBold,
-                    )
+                                ).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+                                    .toFloat()
+                                navController.navigate(
+                                    Screen.Visual.withValue(
+                                        convertToML(drinkAmount.toDouble(), waterUnit).toBigDecimal()
+                                            .setScale(2, RoundingMode.HALF_UP).toFloat(),
+                                        value
+                                    )
+                                )
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (isPressed) Color.White else BackgroundDark,
+                                disabledContainerColor = IconBackgroundGray
+                            ),
+                            border = BorderStroke(1.dp, if (isEnabled) BackgroundDark else Gray),
+                            interactionSource = interactionSource,
+                        ) {
+                            Text(
+                                "Calculate",
+                                fontSize = 16.sp,
+                                color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
+                                modifier = Modifier.padding(vertical = 4.dp),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                    }
                 }
-            }
-            Spacer(Modifier.height(8.dp))
-            if (result.isNotEmpty())
-                Text(
-                    text = "$result ml",
-                    fontSize = 16.sp,
-                    color = BackgroundDark,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    fontWeight = FontWeight.SemiBold,
-                    textAlign = TextAlign.Center,
-                )
+            else
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .padding(vertical = 24.dp, horizontal = 16.dp)
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Column {
+                        Image(
+                            painter = painterResource(R.drawable.glass_water_illustration_jpg),
+                            contentDescription = null
+                        )
+                        CustomInput(
+                            imeAction = ImeAction.Done,
+                            isRequired = true,
+                            isDigitOnly = true,
+                            label = "How much water did you drink today?",
+                            hint = "Enter your Amount",
+                            initialValue = drinkAmount,
+                            onChange = { drinkAmount = it },
+                            isSuffixDropdown = true,
+                            options = WaterUnit.entries,
+                            selectedOption = waterUnit,
+                            optionLabel = { it?.name ?: "-" },
+                            onOptionSelected = { unit -> if (unit != null) waterUnit = unit }
+                        )
+                    }
+                    Button(
+                        enabled = isEnabled,
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = {
+                            if (drinkAmount.toDoubleOrNull() != null)
+                                isNext = true
+                            else Toast.makeText(
+                                context,
+                                "Please make sure you have entered the correct number format 😊",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = if (isPressed) Color.White else BackgroundDark,
+                            disabledContainerColor = IconBackgroundGray
+                        ),
+                        border = BorderStroke(1.dp, if (isEnabled) BackgroundDark else Gray),
+                        interactionSource = interactionSource,
+                    ) {
+                        Text(
+                            "Next",
+                            fontSize = 16.sp,
+                            color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
         }
     }
 }
@@ -405,9 +433,18 @@ private fun calculateClimate(temp: Double, unit: TempUnit): Double {
     }
 }
 
-fun calculateGender(gender: Gender): Double {
+private fun calculateGender(gender: Gender): Double {
     return when (gender) {
         Gender.Male -> 10 / 100.0
         Gender.Female -> 0.0
+    }
+}
+
+fun convertToML(amount: Double, unit: WaterUnit): Double {
+    return when (unit) {
+        WaterUnit.oz -> amount * 29.5735
+        WaterUnit.glasses -> amount * 250
+        WaterUnit.ml -> amount
+        else -> 0.0
     }
 }

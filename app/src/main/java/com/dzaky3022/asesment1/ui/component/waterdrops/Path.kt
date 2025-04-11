@@ -10,11 +10,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.IntSize
-import com.dzaky3022.asesment1.PointF
-import com.dzaky3022.asesment1.copy
-import com.dzaky3022.asesment1.lerpF
-import com.dzaky3022.asesment1.parabolaInterpolation
-import com.dzaky3022.asesment1.toBoolean
+import com.dzaky3022.asesment1.utils.PointF
+import com.dzaky3022.asesment1.utils.copy
+import com.dzaky3022.asesment1.utils.lerpF
+import com.dzaky3022.asesment1.utils.parabolaInterpolation
+import com.dzaky3022.asesment1.utils.toBoolean
 import com.dzaky3022.asesment1.ui.component.waterdrops.plottedpoints.createInitialMultipliersAsState
 import com.dzaky3022.asesment1.ui.component.waterdrops.plottedpoints.createParabolaAsState
 import com.dzaky3022.asesment1.ui.screen.ElementParams

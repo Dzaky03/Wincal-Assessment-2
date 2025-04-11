@@ -35,11 +35,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.dzaky3022.asesment1.navigate
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.R
+import com.dzaky3022.asesment1.ui.theme.WhiteCaption
+import com.dzaky3022.asesment1.ui.theme.WhiteTitle
 
 @Composable
 fun DashboardScreen(
@@ -68,13 +69,13 @@ fun DashboardScreen(
                     text = "WinCal: Water Intake Calculator",
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = .9f)
+                    color = WhiteTitle
                 )
                 Text(
                     text = "Your personal hydration assistant that helps you stay on top of your daily water intake.",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.White.copy(alpha = .7f)
+                    color = WhiteCaption
                 )
             }
             Image(
@@ -102,7 +103,7 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    navigate(navController, Screen.Visual.route)
+                    navController.navigate(Screen.Form.route)
                 },
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (isPressed) Color.White else Water,

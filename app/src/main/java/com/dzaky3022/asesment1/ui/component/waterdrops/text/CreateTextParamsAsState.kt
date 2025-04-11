@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
@@ -14,8 +15,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
-import com.dzaky3022.asesment1.toPx
+import com.dzaky3022.asesment1.utils.toPx
 import com.dzaky3022.asesment1.ui.screen.ElementParams
+import java.math.RoundingMode
 
 @Composable
 fun createTextParamsAsState(
@@ -27,9 +29,7 @@ fun createTextParamsAsState(
     val unitTextStyle = remember(textStyle) { textStyle.copy(fontSize = textStyle.fontSize / 2) }
 
     val text by remember(waveProgress) {
-        derivedStateOf {
-            (waveProgress * 100).toInt().toString()
-        }
+        mutableStateOf((waveProgress * 100).toBigDecimal().setScale(2, RoundingMode.HALF_UP).toString())
     }
 
     val textProgressSize by remember(text) {
