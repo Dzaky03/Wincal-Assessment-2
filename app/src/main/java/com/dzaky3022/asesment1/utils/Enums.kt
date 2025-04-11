@@ -1,10 +1,16 @@
 package com.dzaky3022.asesment1.utils
 
+import android.content.Context
+import androidx.annotation.StringRes
+import com.dzaky3022.asesment1.R
+
 class Enums {
-    enum class ActivityLevel(val label: String, val value: Double) {
-        Low("Sedentary", 35.0),
-        Medium("Light Exercise", 40.0),
-        High("Heavy Exercise", 45.0);
+    enum class ActivityLevel(@StringRes val labelResId: Int, val value: Double) {
+        Low(R.string.low, 35.0),
+        Medium(R.string.medium, 40.0),
+        High(R.string.high, 45.0);
+
+        fun getLabel(context: Context): String = context.getString(labelResId)
     }
 
     enum class TempUnit(val symbol: String) {
@@ -17,17 +23,16 @@ class Enums {
         Kilogram("kg"),
         Pound("lbs"),
     }
+    enum class Gender(@StringRes val labelResId: Int) {
+        Male(R.string.male),
+        Female(R.string.female);
 
-    enum class Gender(val value: String) {
-        Male("Male"),
-        Female("Female"),
+        fun getLabel(context: Context): String = context.getString(labelResId)
     }
-
     enum class Direction {
         Horizontal,
         Vertical,
     }
-
     enum class WaterUnit {
         ml,
         oz,

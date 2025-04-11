@@ -1,5 +1,6 @@
 package com.dzaky3022.asesment1.ui.component.waterdrops.canvas
 
+import android.content.Context
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
@@ -10,6 +11,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.sp
+import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.ui.theme.*
 import com.dzaky3022.asesment1.ui.screen.Paths
 import com.dzaky3022.asesment1.ui.component.waterdrops.text.TextParams
@@ -47,6 +49,7 @@ fun DrawScope.drawWaves(
 
 
 fun DrawScope.drawTextWithBlendMode(
+    context: Context,
     mask: Path,
     textParams: TextParams,
     isReadyToTap: Boolean,
@@ -55,7 +58,7 @@ fun DrawScope.drawTextWithBlendMode(
     drawText(
         textMeasurer = textParams.textMeasurer,
         topLeft = textParams.textOffset.copy(y = textParams.textOffset.y - 50),
-        text = "That's about...",
+        text = context.getString(R.string.that_s_about),
         style = textParams.textStyle.copy(fontSize = 20.sp)
     )
     drawText(
@@ -73,14 +76,14 @@ fun DrawScope.drawTextWithBlendMode(
     drawText(
         textMeasurer = textParams.textMeasurer,
         topLeft = textParams.textOffset.copy(y = textParams.textOffset.y + 250),
-        text = "Out of your recommended amount.",
+        text = context.getString(R.string.out_of_your_recommended_amount),
         style = textParams.textStyle.copy(fontSize = 16.sp)
     )
     if (isReadyToTap)
         drawText(
             textMeasurer = textParams.textMeasurer,
             topLeft = textParams.textOffset.copy(y = textParams.textOffset.y + 450),
-            text = "Tap to continue...",
+            text = context.getString(R.string.tap_to_continue),
             style = textParams.textStyle.copy(fontSize = 16.sp)
         )
     drawPath(

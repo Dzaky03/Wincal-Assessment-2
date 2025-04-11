@@ -16,9 +16,9 @@
     <string name="weight">"Weight"</string>
     <string name="room_temp">"Room Temperature"</string>
     <string name="tap_to_continue">Tap to continue...</string>
-    <string name="the_amount_you_need_today_is">"The amount you need today is "</string>
-    <string name="you_ve_consumed">"You've consumed "</string>
-    <string name="of_water">" of water"</string>
+    <string name="the_amount_you_need_today_is">"The amount you need today is&#160;"</string>
+    <string name="you_ve_consumed">"You've consumed&#160;"</string>
+    <string name="of_water">"&#160;of water"</string>
     <string name="app_name_complete">WinCal: Water Intake Calculator</string>
     <string name="app_desc">Your personal hydration assistant that helps you stay on top of your daily water intake.</string>
     <string name="water_intake_calculator_text">Water Intake Calculator</string>
@@ -27,4 +27,19 @@
     <string name="water_intake_visualizer">Water Intake Visualizer</string>
     <string name="summary">Summary</string>
     <string name="share">Share</string>
+    <string name="how_much_water_did_you_drink_today">How much water did you drink today?</string>
+    <string name="enter_your_amount">Enter your Amount</string>
+    <string name="please_make_sure_you_have_entered_the_correct_number_format">Please make sure you have entered the correct number format 😊</string>
+    <string name="back_button">Back Button</string>
+    <string name="enter_your">Enter your %1$s</string>
+    <string name="activity_exercise_level">Activity/Exercise Level</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="that_s_about">That\'s about...</string>
+    <string name="out_of_your_recommended_amount">Out of the recommended amount.</string>
+    <string name="simple_view">Simple View</string>
+    <string name="visualized_view">Visualized View</string>
 </resources>

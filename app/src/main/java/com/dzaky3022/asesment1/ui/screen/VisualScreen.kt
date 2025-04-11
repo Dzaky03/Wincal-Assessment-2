@@ -220,10 +220,10 @@ fun WavesDrawing(
                         R.string.share_template,
                         waterResult?.roomTemp,
                         waterResult?.weight,
-                        waterResult?.activityLevel?.name,
+                        waterResult?.activityLevel?.getLabel(context),
                         waterResult?.resultValue,
                         waterResult?.percentage,
-                        waterResult?.gender?.value,
+                        waterResult?.gender?.getLabel(context),
                     )
                 )
                 shareTriggered = false
@@ -324,7 +324,7 @@ fun WavesDrawing(
                                         color = WhiteTitle,
                                         fontWeight = FontWeight.SemiBold,
                                         textAlign = TextAlign.Start,
-                                        fontSize = 45.sp,
+                                        fontSize = 36.sp,
                                     )
                                     Spacer(Modifier.height(32.dp))
                                     Text(
@@ -338,7 +338,7 @@ fun WavesDrawing(
                                         color = WhiteTitle,
                                         fontWeight = FontWeight.SemiBold,
                                         textAlign = TextAlign.End,
-                                        fontSize = 45.sp,
+                                        fontSize = 36.sp,
                                     )
                                 }
                                 Text(
@@ -382,6 +382,7 @@ fun WavesDrawing(
                                     .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
                                     .drawWithContent {
                                         drawTextWithBlendMode(
+                                            context = context,
                                             mask = paths.pathList[0],
                                             textParams = textParams.value,
                                             isReadyToTap = isReadyToTap,
@@ -469,7 +470,7 @@ fun WavesDrawing(
                                 color = WhiteTitle,
                             )
                             Text(
-                                text = "${waterResult?.activityLevel}",
+                                text = "${waterResult?.activityLevel?.getLabel(context)}",
                                 color = WhiteTitle,
                             )
                         }
@@ -480,7 +481,7 @@ fun WavesDrawing(
                                 color = WhiteTitle,
                             )
                             Text(
-                                text = "${waterResult?.gender}",
+                                text = "${waterResult?.gender?.getLabel(context)}",
                                 color = WhiteTitle,
                             )
                         }
@@ -491,7 +492,7 @@ fun WavesDrawing(
                                 color = WhiteTitle,
                             )
                             Text(
-                                text = "${waterResult?.amount}",
+                                text = "${waterResult?.amount} ml",
                                 color = WhiteTitle,
                             )
                         }
@@ -502,7 +503,7 @@ fun WavesDrawing(
                                 color = WhiteTitle,
                             )
                             Text(
-                                text = "${waterResult?.resultValue}",
+                                text = "${waterResult?.resultValue} ml",
                                 color = WhiteTitle,
                             )
                         }
@@ -535,7 +536,7 @@ fun EndScreenView(waveProgress: Float, isSimpleView: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(15.dp),
+            .padding(if (isSimpleView) 0.dp else 15.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -602,7 +603,7 @@ fun MoreMenu(
         DropdownMenuItem(
             text = {
                 Text(
-                    if (!isSimpleView) "Simple View" else "Visualized View",
+                    if (!isSimpleView) stringResource(R.string.simple_view) else stringResource(R.string.visualized_view),
                     fontSize = 15.sp
                 )
             },

@@ -1,5 +1,6 @@
 package com.dzaky3022.asesment1.ui.screen
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -128,7 +129,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                             Icon(
                                 modifier = Modifier.size(20.dp),
                                 imageVector = Icons.Default.ArrowBackIosNew,
-                                contentDescription = "Back Button",
+                                contentDescription = stringResource(R.string.back_button),
                                 tint = Color.Unspecified
                             )
                         }
@@ -176,8 +177,8 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                         CustomInput(
                             isRequired = true,
                             isDigitOnly = true,
-                            label = "Room Temperature",
-                            hint = "Enter your Room Temperature",
+                            label = stringResource(R.string.room_temp),
+                            hint = stringResource(R.string.enter_your, stringResource(R.string.room_temp)),
                             initialValue = temp,
                             onChange = { temp = it },
                             isSuffixDropdown = true,
@@ -191,8 +192,8 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                             imeAction = ImeAction.Done,
                             isRequired = true,
                             isDigitOnly = true,
-                            label = "Weight",
-                            hint = "Enter your Weight",
+                            label = stringResource(R.string.weight),
+                            hint = stringResource(R.string.enter_your, stringResource(R.string.weight)),
                             initialValue = weight,
                             onChange = { weight = it },
                             isSuffixDropdown = true,
@@ -203,13 +204,15 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                         )
                         Spacer(Modifier.height(10.dp))
                         RadioButtonGroup(
-                            label = "Activity/Exercise Level",
+                            context = context,
+                            label = stringResource(R.string.activity_exercise_level),
                             options = ActivityLevel.entries,
                             selectedOption = activityLevel,
                             onOptionSelected = { activityLevel = it }
                         )
                         RadioButtonGroup(
-                            label = "Gender",
+                            context = context,
+                            label =stringResource(R.string.gender),
                             direction = Direction.Horizontal,
                             options = Gender.entries,
                             selectedOption = gender,
@@ -286,8 +289,8 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                             imeAction = ImeAction.Done,
                             isRequired = true,
                             isDigitOnly = true,
-                            label = "How much water did you drink today?",
-                            hint = "Enter your Amount",
+                            label = stringResource(R.string.how_much_water_did_you_drink_today),
+                            hint = stringResource(R.string.enter_your_amount),
                             initialValue = drinkAmount,
                             onChange = { drinkAmount = it },
                             isSuffixDropdown = true,
@@ -305,7 +308,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                                 isNext = true
                             else Toast.makeText(
                                 context,
-                                "Please make sure you have entered the correct number format 😊",
+                                context.getString(R.string.please_make_sure_you_have_entered_the_correct_number_format),
                                 Toast.LENGTH_SHORT
                             ).show()
                         },
@@ -332,6 +335,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
 
 @Composable
 private fun <T> RadioButtonGroup(
+    context: Context,
     label: String,
     direction: Direction = Direction.Horizontal,
     options: List<T>,
@@ -375,7 +379,11 @@ private fun <T> RadioButtonGroup(
                             colors = RadioButtonDefaults.colors(selectedColor = BackgroundDark)
                         )
                         Text(
-                            text = option.toString(),
+                            text = when (option) {
+                                is ActivityLevel -> option.getLabel(context)
+                                is Gender -> option.getLabel(context)
+                                else -> option.toString()
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
@@ -399,7 +407,11 @@ private fun <T> RadioButtonGroup(
                         colors = RadioButtonDefaults.colors(selectedColor = BackgroundDark)
                     )
                     Text(
-                        text = option.toString(),
+                        text = when (option) {
+                            is ActivityLevel -> option.getLabel(context)
+                            is Gender -> option.getLabel(context)
+                            else -> option.toString()
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                     )
                 }
