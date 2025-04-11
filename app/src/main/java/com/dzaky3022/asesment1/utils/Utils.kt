@@ -12,6 +12,8 @@ import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.screen.ElementParams
 import java.io.File
+import java.math.BigDecimal
+import java.math.RoundingMode
 import kotlin.math.pow
 
 fun isAboveElement(waterLevel: Int, bufferY: Float, position: Offset) =
@@ -110,4 +112,11 @@ fun shareData(context: Context, bitmap: Bitmap, caption: String) {
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
     context.startActivity(Intent.createChooser(shareIntent, "Share Screenshot"))
+}
+
+
+fun roundUpTwoDecimals(value: Float): Float {
+    return BigDecimal(value.toString())
+        .setScale(2, RoundingMode.UP)
+        .toFloat()
 }

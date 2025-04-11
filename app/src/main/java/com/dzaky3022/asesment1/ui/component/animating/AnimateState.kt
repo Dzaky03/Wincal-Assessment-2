@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 enum class WaterLevelState {
     StartReady,
     Animating,
+    Done,
 }
 
 @Composable
@@ -33,13 +34,15 @@ fun waveProgressAsState(
 
             WaterLevelState.Animating -> {
                 animatable.animateTo(
-                    targetValue = percentage!!/100,
+                    targetValue = percentage!! / 100,
                     animationSpec = tween(
                         durationMillis = timerDurationInMillis.toInt(),
                         easing = LinearEasing
                     )
                 )
             }
+
+            else -> animatable
         }
     }
 

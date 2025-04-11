@@ -1,5 +1,30 @@
 <resources>
     <string name="app_name">WinCal</string>
     <string name="button_start">Start</string>
-    <string name="share_template">Room Temperature: %1$s cm\nWeight: %2$s cm\nActivity Level: %3$.0f\Water Intake Needed Today:%4$.0f</string>
+    <string name="share_template">Room Temperature: %1$.2f Weight: %2$.2f Activity Level: %3$s Water Intake Needed Today: %4$.2f ml Drink Taken vs Needed: %5$.2f%% Gender: %6$s</string>
+    <string name="tap_to_go_back">Tap to go back...</string>
+    <string name="share_title">Share your result to your friend by pressing share button on top right corner menu!</string>
+    <string name="goal_achieved">Goal Achieved! 🥳🎉</string>
+    <string name="almost">Almost there! Just a bit more 💧</string>
+    <string name="half">You\'re halfway there! Keep it up 💪</string>
+    <string name="falling_behind">You\'re falling behind! Drink some water ⚠️</string>
+    <string name="percentage">"Percentage"</string>
+    <string name="water_needed">"Water Needed"</string>
+    <string name="water_consumed">"Water Consumed"</string>
+    <string name="gender">"Gender"</string>
+    <string name="activity_level">"Activity Level"</string>
+    <string name="weight">"Weight"</string>
+    <string name="room_temp">"Room Temperature"</string>
+    <string name="tap_to_continue">Tap to continue...</string>
+    <string name="the_amount_you_need_today_is">"The amount you need today is "</string>
+    <string name="you_ve_consumed">"You've consumed "</string>
+    <string name="of_water">" of water"</string>
+    <string name="app_name_complete">WinCal: Water Intake Calculator</string>
+    <string name="app_desc">Your personal hydration assistant that helps you stay on top of your daily water intake.</string>
+    <string name="water_intake_calculator_text">Water Intake Calculator</string>
+    <string name="calculate">Calculate</string>
+    <string name="next">Next</string>
+    <string name="water_intake_visualizer">Water Intake Visualizer</string>
+    <string name="summary">Summary</string>
+    <string name="share">Share</string>
 </resources>

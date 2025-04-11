@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WinCal</string>
+    <string name="button_start">Mulai</string>
+    <string name="share_template">Suhu Kamar: %1 $ .2F Berat: %2 $ .2F Level Kegiatan: %3 $ S Asupan air Dibutuhkan Hari Ini: %4 $ .2F ML Minuman Diambil VS Diperlukan: %5 $ .2F %% Jenis Kelamin: %6 $ S</string>
+    <string name="tap_to_go_back">Ketuk untuk kembali ...</string>
+    <string name="share_title">Bagikan hasil Anda kepada teman Anda dengan menekan tombol Bagikan di menu sudut kanan atas!</string>
+    <string name="goal_achieved">Tujuan tercapai! 🥳🎉</string>
+    <string name="almost">Hampir sampai di sana! Sedikit lebih 💧</string>
+    <string name="half">Anda setengah di sana! Pertahankan 💪</string>
+    <string name="falling_behind">Anda tertinggal! Minumlah air ⚠️</string>
+    <string name="percentage">Persentase</string>
+    <string name="water_needed">Air dibutuhkan</string>
+    <string name="water_consumed">Air dikonsumsi</string>
+    <string name="gender">Jenis kelamin</string>
+    <string name="activity_level">Tingkat aktivitas</string>
+    <string name="weight">Berat</string>
+    <string name="room_temp">Suhu kamar</string>
+    <string name="tap_to_continue">Ketuk untuk melanjutkan ...</string>
+    <string name="the_amount_you_need_today_is">Jumlah yang Anda butuhkan hari ini adalah</string>
+    <string name="you_ve_consumed">Anda telah mengonsumsi sebanyak</string>
+    <string name="of_water">air</string>
+    <string name="app_name_complete">Wincal: Kalkulator Asupan Air</string>
+    <string name="app_desc">Asisten hidrasi pribadi Anda yang membantu Anda tetap di atas asupan air harian Anda.</string>
+    <string name="water_intake_calculator_text">Kalkulator Asupan Air</string>
+    <string name="calculate">Hitung</string>
+    <string name="next">Berikutnya</string>
+    <string name="water_intake_visualizer">Visualisasi asupan air</string>
+    <string name="summary">Ringkasan</string>
+    <string name="share">Bagikan</string>
+</resources>

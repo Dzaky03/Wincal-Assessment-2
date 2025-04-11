@@ -2,7 +2,6 @@ package com.dzaky3022.asesment1.ui.screen
 
 import android.graphics.Bitmap
 import android.util.Log
-import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.MoreVert
@@ -45,18 +47,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -68,8 +69,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.drawToBitmap
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
-import com.dzaky3022.asesment1.utils.navigate
-import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.utils.shareData
 import com.dzaky3022.asesment1.ui.component.animating.WaterLevelState
 import com.dzaky3022.asesment1.ui.component.animating.waveProgressAsState
@@ -85,12 +84,10 @@ import com.dzaky3022.asesment1.ui.component.waterdrops.wave.createAnimationsAsSt
 import com.dzaky3022.asesment1.ui.model.WaterResult
 import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
-import com.dzaky3022.asesment1.ui.theme.Danger
-import com.dzaky3022.asesment1.ui.theme.Success
-import com.dzaky3022.asesment1.ui.theme.Warning
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.ui.theme.WhiteTitle
 import com.dzaky3022.asesment1.utils.Enums.*
+import com.dzaky3022.asesment1.utils.roundUpTwoDecimals
 import kotlinx.coroutines.launch
 
 @Composable
@@ -125,7 +122,7 @@ fun WaterLevelDrawing(
     content: () -> WaterDropText,
 ) {
     val waveDuration by rememberSaveable { mutableLongStateOf(waveDurationInMills) }
-    var waterLevelState by remember { mutableStateOf(WaterLevelState.StartReady) }
+    var waterLevelState by rememberSaveable { mutableStateOf(WaterLevelState.StartReady) }
     val waveProgress by waveProgressAsState(
         timerState = waterLevelState,
         percentage = waterResult?.percentage,
@@ -135,6 +132,7 @@ fun WaterLevelDrawing(
         modifier = modifier,
         waveDuration = waveDuration,
         animations = animations,
+        waterLevelState = waterLevelState,
         waveProgress = waveProgress,
         waveParams = waveParams,
         waterResult = waterResult,
@@ -149,6 +147,7 @@ fun WaterLevelDrawing(
 fun WavesDrawing(
     modifier: Modifier = Modifier,
     waveDuration: Long,
+    waterLevelState: WaterLevelState,
     waveParams: WaveParams,
     animations: MutableList<State<Float>>,
     waveProgress: Float,
@@ -159,9 +158,11 @@ fun WavesDrawing(
 ) {
     val elementParams by remember { mutableStateOf(ElementParams()) }
     var containerSize by remember { mutableStateOf(IntSize(0, 0)) }
-    var expanded by remember { mutableStateOf(false) }
-    var isSimpleView by remember { mutableStateOf(false) }
-    var currentScreenState by remember { mutableStateOf(ScreenState.FirstScreen) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var isSimpleView by rememberSaveable { mutableStateOf(false) }
+    var shareTriggered by rememberSaveable { mutableStateOf(false) }
+    var isReadyToTap by rememberSaveable { mutableStateOf(false) }
+    var currentScreenState by rememberSaveable { mutableStateOf(ScreenState.FirstScreen) }
     val context = LocalContext.current
     val view = LocalView.current
     val coroutineScope = rememberCoroutineScope()
@@ -199,8 +200,45 @@ fun WavesDrawing(
         elementParams = elementParams
     )
     LaunchedEffect(waterResult, currentScreenState) {
-        if (waterResult != null && currentScreenState == ScreenState.SecondScreen)
+        if (waterResult != null && currentScreenState == ScreenState.SecondScreen && !isReadyToTap)
             onWaterAnimated(WaterLevelState.Animating)
+    }
+    Log.d(
+        "Visual Screen",
+        "test ${textParams.value.text.contains(roundUpTwoDecimals(waterResult?.percentage ?: 0f).toString())} or ${textParams.value.text} or ${
+            roundUpTwoDecimals(waterResult?.percentage ?: 0f)
+        }"
+    )
+    LaunchedEffect(textParams.value.text) {
+        if (textParams.value.text.contains(
+                roundUpTwoDecimals(
+                    waterResult?.percentage ?: 0f
+                ).toString()
+            )
+        )
+            onWaterAnimated(WaterLevelState.Done)
+    }
+    LaunchedEffect(waterLevelState) {
+        isReadyToTap = waterLevelState == WaterLevelState.Done
+    }
+    LaunchedEffect(shareTriggered) {
+        if (isSimpleView && shareTriggered)
+            coroutineScope.launch {
+                val bitmap = view.drawToBitmap()
+                imageBitmap.value = bitmap
+                shareData(
+                    context, bitmap, context.getString(
+                        R.string.share_template,
+                        waterResult?.roomTemp,
+                        waterResult?.weight,
+                        waterResult?.activityLevel?.name,
+                        waterResult?.resultValue,
+                        waterResult?.percentage,
+                        waterResult?.gender?.value,
+                    )
+                )
+                shareTriggered = false
+            }
     }
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -225,7 +263,7 @@ fun WavesDrawing(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            "Water Intake Visualizer",
+                            text = stringResource(R.string.water_intake_visualizer),
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                         )
                     }
@@ -242,18 +280,16 @@ fun WavesDrawing(
                     }
                     MoreMenu(
                         expanded = expanded,
+                        isSimpleView = isSimpleView,
                         onDismiss = {
                             expanded = false
                         },
                         onChangeView = {
-                            navigate(navController, Screen.Form.route)
+                            isSimpleView = !isSimpleView
                         },
                         onShare = {
-                            coroutineScope.launch {
-                                val bitmap = view.drawToBitmap()
-                                imageBitmap.value = bitmap
-                                shareData(context, bitmap, "this is a caption")
-                            }
+                            isSimpleView = true
+                            shareTriggered = true
                         },
                     );
                 },
@@ -262,202 +298,309 @@ fun WavesDrawing(
         },
         content = { paddingValues ->
             if (!isSimpleView)
-            when (currentScreenState) {
-                ScreenState.FirstScreen -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                            .background(
-                                BackgroundDark
-                            )
-                            .clickable {
-                                currentScreenState = ScreenState.SecondScreen
-                            }
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(15.dp),
-                            verticalArrangement = Arrangement.SpaceBetween,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            Column {
-                                Spacer(
-                                    Modifier.height(50.dp)
-                                )
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = buildAnnotatedString {
-                                        append("You've consumed ")
-                                        withStyle(style = SpanStyle(color = Water)) {
-                                            append("${waterResult?.amount} ml")
-                                        }
-                                        append(" of water")
-                                    },
-                                    color = WhiteTitle,
-                                    fontWeight = FontWeight.SemiBold,
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 45.sp,
-                                )
-                                Spacer(Modifier.height(32.dp))
-                                Text(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = buildAnnotatedString {
-                                        append("The amount you need today is\n")
-                                        withStyle(style = SpanStyle(color = Water)) {
-                                            append("${waterResult?.resultValue} ml")
-                                        }
-                                    },
-                                    color = WhiteTitle,
-                                    fontWeight = FontWeight.SemiBold,
-                                    textAlign = TextAlign.End,
-                                    fontSize = 45.sp,
-                                )
-                            }
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = "Tap to continue...",
-                                color = WhiteTitle,
-                                fontWeight = FontWeight.SemiBold,
-                                textAlign = TextAlign.Center,
-                                fontSize = 20.sp,
-                            )
-                        }
-                    }
-                }
-                ScreenState.SecondScreen -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clickable {
-                                currentScreenState = ScreenState.ThirdScreen
-                            }
-                    ) {
-                        Canvas(
+                when (currentScreenState) {
+                    ScreenState.FirstScreen -> {
+                        Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(paddingValues)
                                 .background(
                                     BackgroundDark
                                 )
+                                .clickable {
+                                    currentScreenState = ScreenState.SecondScreen
+                                }
                         ) {
-                            drawWaves(paths, waveProgress)
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(15.dp)
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.SpaceBetween,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                Column {
+                                    Spacer(
+                                        Modifier.height(50.dp)
+                                    )
+                                    Text(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        text = buildAnnotatedString {
+                                            append(stringResource(R.string.you_ve_consumed))
+                                            withStyle(style = SpanStyle(color = Water)) {
+                                                append("${waterResult?.amount} ml")
+                                            }
+                                            append(stringResource(R.string.of_water))
+                                        },
+                                        color = WhiteTitle,
+                                        fontWeight = FontWeight.SemiBold,
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 45.sp,
+                                    )
+                                    Spacer(Modifier.height(32.dp))
+                                    Text(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        text = buildAnnotatedString {
+                                            append(stringResource(R.string.the_amount_you_need_today_is))
+                                            withStyle(style = SpanStyle(color = Water)) {
+                                                append("${waterResult?.resultValue} ml")
+                                            }
+                                        },
+                                        color = WhiteTitle,
+                                        fontWeight = FontWeight.SemiBold,
+                                        textAlign = TextAlign.End,
+                                        fontSize = 45.sp,
+                                    )
+                                }
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(R.string.tap_to_continue),
+                                    color = WhiteTitle,
+                                    fontWeight = FontWeight.SemiBold,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 20.sp,
+                                )
+                            }
                         }
+                    }
+
+                    ScreenState.SecondScreen -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .then(if (isReadyToTap)
+                                    Modifier.clickable {
+                                        currentScreenState = ScreenState.ThirdScreen
+                                    } else Modifier)
+                        ) {
+                            Canvas(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(paddingValues)
+                                    .background(
+                                        BackgroundDark
+                                    )
+                            ) {
+                                drawWaves(paths, waveProgress)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(paddingValues)
+                                    .onGloballyPositioned {
+                                        containerSize = IntSize(it.size.width, it.size.height)
+                                    }
+                                    .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+                                    .drawWithContent {
+                                        drawTextWithBlendMode(
+                                            mask = paths.pathList[0],
+                                            textParams = textParams.value,
+                                            isReadyToTap = isReadyToTap,
+                                        )
+                                    }
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                Text(
+                                    modifier = content().modifier
+                                        .align(content().align)
+                                        .offset(x = 50.dp)
+                                        .onGloballyPositioned {
+                                            elementParams.position = it.positionInParent()
+                                            elementParams.size = it.size
+                                        },
+                                    text = "77.00%",
+                                    style = content().textStyle
+                                )
+                            }
+                        }
+                    }
+
+                    ScreenState.ThirdScreen -> {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(paddingValues)
-                                .onGloballyPositioned {
-                                    containerSize = IntSize(it.size.width, it.size.height)
-                                }
-                                .graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
-                                .drawWithContent {
-                                    drawTextWithBlendMode(
-                                        mask = paths.pathList[0],
-                                        textParams = textParams.value
-                                    )
+                                .background(
+                                    BackgroundDark
+                                )
+                                .clickable {
+                                    currentScreenState = ScreenState.SecondScreen
                                 }
                         ) {
-                            Text(
-                                modifier = content().modifier
-                                    .align(content().align)
-                                    .offset(x = 50.dp)
-                                    .onGloballyPositioned {
-                                        elementParams.position = it.positionInParent()
-                                        elementParams.size = it.size
-                                    },
-                                text = "77.00%",
-                                style = content().textStyle
-                            )
+                            EndScreenView(waveProgress, isSimpleView)
                         }
                     }
                 }
-                ScreenState.ThirdScreen -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
-                            .background(
-                                BackgroundDark
-                            )
-                            .clickable {
-                                currentScreenState = ScreenState.SecondScreen
-                            }
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(15.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            val image = when {
-                                waveProgress >= 1f -> R.drawable.very_high
-                                waveProgress > 0.75f -> R.drawable.high
-                                waveProgress > 0.5f -> R.drawable.medium
-                                else -> R.drawable.low
-                            }
-                            val text = when {
-                                waveProgress >= 1f -> "Goal Achieved! 🥳🎉"
-                                waveProgress > 0.75f -> "Almost there! Just a bit more 💧"
-                                waveProgress > 0.5f -> "You're halfway there! Keep it up 💪"
-                                else -> "You're falling behind! Drink some water ⚠️"
-                            }
-                            Image(
-                                modifier = Modifier.size(146.dp, 242.dp),
-                                painter = painterResource(image),
-                                contentDescription = null,
-                            )
-                            Spacer(Modifier.height(24.dp))
-                            Text(
-                                text = text,
-                                color = WhiteTitle,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 22.sp,
-                                textAlign = TextAlign.Center,
-                            )
-                            Spacer(Modifier.height(24.dp))
-                            Text(
-                                text = "Share your result to your friend by pressing share button on top right corner menu!",
-                                color = WhiteTitle,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 16.sp,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-                }
-            }
             else
-                Column {
-                    Text(
-                        text = "Water Consumed"
-                    )
-                    Text(
-                        text = "${waterResult?.amount}"
-                    )
-                    Text(
-                        text = "Water Needed"
-                    )
-                    Text(
-                        text = "${waterResult?.resultValue}"
-                    )
-                    Text(
-                        text = "Percentage"
-                    )
-                    Text(
-                        text = "${waterResult?.percentage}"
-                    )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .background(
+                            BackgroundDark
+                        )
+                        .verticalScroll(rememberScrollState()),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(24.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.summary),
+                            fontSize = 24.sp,
+                            color = WhiteTitle,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.room_temp)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${waterResult?.roomTemp}",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.weight)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${waterResult?.weight}",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.activity_level)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${waterResult?.activityLevel}",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.gender)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${waterResult?.gender}",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.water_consumed)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${waterResult?.amount}",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.water_needed)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${waterResult?.resultValue}",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row {
+                            Text(
+                                text = "${stringResource(R.string.percentage)}: ",
+                                color = WhiteTitle,
+                            )
+                            Text(
+                                text = "${textParams.value.text}%",
+                                color = WhiteTitle,
+                            )
+                        }
+                        Spacer(Modifier.height(32.dp))
+                        Text(
+                            text = "-------------",
+                            color = WhiteTitle,
+                        )
+                        Spacer(Modifier.height(32.dp))
+                        EndScreenView(waveProgress, isSimpleView)
+                    }
                 }
         }
     )
 }
 
 @Composable
+fun EndScreenView(waveProgress: Float, isSimpleView: Boolean) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(15.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        val image = when {
+            waveProgress >= 1f -> R.drawable.very_high
+            waveProgress > 0.75f -> R.drawable.high
+            waveProgress > 0.5f -> R.drawable.medium
+            else -> R.drawable.low
+        }
+        val text = when {
+            waveProgress >= 1f -> stringResource(R.string.goal_achieved)
+            waveProgress > 0.75f -> stringResource(R.string.almost)
+            waveProgress > 0.5f -> stringResource(R.string.half)
+            else -> stringResource(R.string.falling_behind)
+        }
+        Image(
+            modifier = if (!isSimpleView) Modifier.size(146.dp, 242.dp) else Modifier,
+            painter = painterResource(image),
+            contentDescription = null,
+        )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = text,
+            color = WhiteTitle,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 22.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            text = stringResource(R.string.share_title),
+            color = WhiteTitle,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(42.dp))
+        if (!isSimpleView)
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.tap_to_go_back),
+                color = WhiteTitle,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+            )
+    }
+}
+
+@Composable
 fun MoreMenu(
     modifier: Modifier = Modifier,
     expanded: Boolean,
+    isSimpleView: Boolean,
     onChangeView: () -> Unit = {},
     onShare: () -> Unit = {},
     onDismiss: () -> Unit = {},
@@ -468,14 +611,19 @@ fun MoreMenu(
         onDismissRequest = onDismiss,
     ) {
         DropdownMenuItem(
-            text = { Text("Simple View", fontSize = 15.sp) },
+            text = {
+                Text(
+                    if (!isSimpleView) "Simple View" else "Visualized View",
+                    fontSize = 15.sp
+                )
+            },
             onClick = {
                 onChangeView()
                 onDismiss()
             }
         )
         DropdownMenuItem(
-            text = { Text("Share", fontSize = 15.sp) },
+            text = { Text(text = stringResource(R.string.share), fontSize = 15.sp) },
             onClick = {
                 onShare()
                 onDismiss()

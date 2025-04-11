@@ -55,6 +55,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -64,6 +65,7 @@ import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.CustomInput
+import com.dzaky3022.asesment1.ui.model.WaterResult
 import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Danger
@@ -139,7 +141,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                     ) {
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
-                            text = "Water intake Calculator",
+                            text = stringResource(R.string.water_intake_calculator_text),
                             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
                         )
                     }
@@ -234,9 +236,16 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                                     .toFloat()
                                 navController.navigate(
                                     Screen.Visual.withValue(
-                                        convertToML(drinkAmount.toDouble(), waterUnit).toBigDecimal()
-                                            .setScale(2, RoundingMode.HALF_UP).toFloat(),
-                                        value
+                                        WaterResult(
+                                            amount = convertToML(drinkAmount.toDouble(), waterUnit).toBigDecimal()
+                                                .setScale(2, RoundingMode.HALF_UP).toFloat(),
+                                            resultValue = value,
+                                            roomTemp = temp.toFloat(),
+                                            gender = gender,
+                                            weight = weight.toFloat(),
+                                            activityLevel = activityLevel,
+                                            percentage = 0f,
+                                        )
                                     )
                                 )
                             },
@@ -249,7 +258,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                             interactionSource = interactionSource,
                         ) {
                             Text(
-                                "Calculate",
+                                text = stringResource(R.string.calculate),
                                 fontSize = 16.sp,
                                 color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
                                 modifier = Modifier.padding(vertical = 4.dp),
@@ -309,7 +318,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                         interactionSource = interactionSource,
                     ) {
                         Text(
-                            "Next",
+                            text = stringResource(R.string.next),
                             fontSize = 16.sp,
                             color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
                             fontWeight = FontWeight.SemiBold

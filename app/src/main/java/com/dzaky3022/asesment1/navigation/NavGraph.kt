@@ -31,6 +31,7 @@ import com.dzaky3022.asesment1.ui.screen.VisualScreen
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Poppins
 import com.dzaky3022.asesment1.ui.theme.Water
+import com.dzaky3022.asesment1.utils.Enums.*
 import com.dzaky3022.asesment1.waveGap
 
 @Composable
@@ -63,7 +64,7 @@ fun NavGraph() {
             exitTransition = {
                 scaleOut(targetScale = 1.2f) + fadeOut()
             }
-            ) {
+        ) {
             FormScreen(
                 navController = navController,
             )
@@ -73,6 +74,18 @@ fun NavGraph() {
                 type = NavType.FloatType
             },
             navArgument(KEY_RESULT_VALUE) {
+                type = NavType.FloatType
+            },
+            navArgument(KEY_TEMP_VALUE) {
+                type = NavType.FloatType
+            },
+            navArgument(KEY_ACT_LVL_VALUE) {
+                type = NavType.StringType
+            },
+            navArgument(KEY_GENDER_VALUE) {
+                type = NavType.StringType
+            },
+            navArgument(KEY_WEIGHT_VALUE) {
                 type = NavType.FloatType
             },
         ),
@@ -85,9 +98,23 @@ fun NavGraph() {
         ) {
             val amount = it.arguments?.getFloat(KEY_AMOUNT_VALUE) ?: 0f
             val resultValue = it.arguments?.getFloat(KEY_RESULT_VALUE) ?: 0f
-            val percentage = amount/resultValue*100
+            val temp = it.arguments?.getFloat(KEY_TEMP_VALUE) ?: 0f
+            val actLvl = it.arguments?.getString(KEY_ACT_LVL_VALUE) ?: ""
+            val gender = it.arguments?.getString(KEY_GENDER_VALUE) ?: ""
+            val weight = it.arguments?.getFloat(KEY_WEIGHT_VALUE) ?: 0f
+            val percentage = amount / resultValue * 100
             Log.d("NavGraph", "amount: $amount, result: $resultValue, percentage: $percentage")
-            val waterResult = WaterResult(amount, resultValue, percentage)
+            val activityLevel = ActivityLevel.valueOf(actLvl)
+            val genderEnum = Gender.valueOf(gender)
+            val waterResult = WaterResult(
+                amount = amount,
+                resultValue = resultValue,
+                roomTemp = temp,
+                activityLevel = activityLevel,
+                gender = genderEnum,
+                weight = weight,
+                percentage = percentage,
+            )
             VisualScreen(
                 modifier = Modifier,
                 waveDurationInMills = 3000L,

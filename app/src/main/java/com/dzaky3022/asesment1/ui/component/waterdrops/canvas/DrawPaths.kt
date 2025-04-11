@@ -49,6 +49,7 @@ fun DrawScope.drawWaves(
 fun DrawScope.drawTextWithBlendMode(
     mask: Path,
     textParams: TextParams,
+    isReadyToTap: Boolean,
 ) {
 
     drawText(
@@ -75,12 +76,13 @@ fun DrawScope.drawTextWithBlendMode(
         text = "Out of your recommended amount.",
         style = textParams.textStyle.copy(fontSize = 16.sp)
     )
-    drawText(
-        textMeasurer = textParams.textMeasurer,
-        topLeft = textParams.textOffset.copy(y = textParams.textOffset.y + 450),
-        text = "Tap to continue...",
-        style = textParams.textStyle.copy(fontSize = 16.sp)
-    )
+    if (isReadyToTap)
+        drawText(
+            textMeasurer = textParams.textMeasurer,
+            topLeft = textParams.textOffset.copy(y = textParams.textOffset.y + 450),
+            text = "Tap to continue...",
+            style = textParams.textStyle.copy(fontSize = 16.sp)
+        )
     drawPath(
         path = mask,
         color = BackgroundDark,

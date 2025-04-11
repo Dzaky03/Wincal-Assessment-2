@@ -66,13 +66,13 @@ fun DashboardScreen(
         ) {
             Column {
                 Text(
-                    text = "WinCal: Water Intake Calculator",
+                    text = stringResource(R.string.app_name_complete),
                     fontSize = 38.sp,
                     fontWeight = FontWeight.Bold,
                     color = WhiteTitle
                 )
                 Text(
-                    text = "Your personal hydration assistant that helps you stay on top of your daily water intake.",
+                    text = stringResource(R.string.app_desc),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = WhiteCaption
