@@ -4,7 +4,7 @@
     <string name="button_start">Mulai</string>
     <string name="share_template">Suhu Ruang: %1$.2f\nBerat: %2$.2f\nLevel Kegiatan: %3$s\nAsupan air Dibutuhkan Hari Ini: %4$.2f ml\nAir diminum vs Diperlukan: %5$.2f%%\nJenis Kelamin: %6$s</string>
     <string name="tap_to_go_back">Ketuk untuk kembali...</string>
-    <string name="share_title">Bagikan hasil Anda kepada teman Anda dengan menekan tombol Bagikan di menu sudut kanan atas!</string>
+    <string name="share_title">Bagikan hasil Anda kepada teman dengan menggunakan menu pada sudut kanan atas!</string>
     <string name="goal_achieved">Tujuan tercapai! 🥳🎉</string>
     <string name="almost">Hampir sampai! Sedikit lagi💧</string>
     <string name="half">Anda setengah di sana! Pertahankan 💪</string>

@@ -569,8 +569,7 @@ fun EndScreenView(waveProgress: Float, isSimpleView: Boolean) {
         Text(
             text = stringResource(R.string.share_title),
             color = WhiteTitle,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(42.dp))
