@@ -1,7 +1,6 @@
 package com.dzaky3022.asesment1.ui.screen
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -69,7 +68,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.drawToBitmap
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
-import com.dzaky3022.asesment1.utils.shareData
 import com.dzaky3022.asesment1.ui.component.animating.WaterLevelState
 import com.dzaky3022.asesment1.ui.component.animating.waveProgressAsState
 import com.dzaky3022.asesment1.ui.component.waterdrops.canvas.drawTextWithBlendMode
@@ -82,12 +80,12 @@ import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText
 import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams
 import com.dzaky3022.asesment1.ui.component.waterdrops.wave.createAnimationsAsState
 import com.dzaky3022.asesment1.ui.model.WaterResult
-import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.ui.theme.WhiteTitle
-import com.dzaky3022.asesment1.utils.Enums.*
-import com.dzaky3022.asesment1.utils.roundUpTwoDecimals
+import com.dzaky3022.asesment1.utils.Enums.ScreenState
+import com.dzaky3022.asesment1.utils.shareData
 import kotlinx.coroutines.launch
 
 @Composable
@@ -203,19 +201,10 @@ fun WavesDrawing(
         if (waterResult != null && currentScreenState == ScreenState.SecondScreen && !isReadyToTap)
             onWaterAnimated(WaterLevelState.Animating)
     }
-    Log.d(
-        "Visual Screen",
-        "test ${textParams.value.text.contains(roundUpTwoDecimals(waterResult?.percentage ?: 0f).toString())} or ${textParams.value.text} or ${
-            roundUpTwoDecimals(waterResult?.percentage ?: 0f)
-        }"
-    )
-    LaunchedEffect(textParams.value.text) {
-        if (textParams.value.text.contains(
-                roundUpTwoDecimals(
-                    waterResult?.percentage ?: 0f
-                ).toString()
+    LaunchedEffect(waveProgress) {
+        if (waveProgress >=
+                (waterResult?.percentage ?: 0f)/100
             )
-        )
             onWaterAnimated(WaterLevelState.Done)
     }
     LaunchedEffect(waterLevelState) {
