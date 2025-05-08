@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.navigation.Screen
-import com.dzaky3022.asesment1.ui.screen.ElementParams
+import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
 import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode

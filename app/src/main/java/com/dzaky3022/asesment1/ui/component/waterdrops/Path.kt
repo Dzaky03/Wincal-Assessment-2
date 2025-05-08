@@ -17,8 +17,8 @@ import com.dzaky3022.asesment1.utils.parabolaInterpolation
 import com.dzaky3022.asesment1.utils.toBoolean
 import com.dzaky3022.asesment1.ui.component.waterdrops.plottedpoints.createInitialMultipliersAsState
 import com.dzaky3022.asesment1.ui.component.waterdrops.plottedpoints.createParabolaAsState
-import com.dzaky3022.asesment1.ui.screen.ElementParams
-import com.dzaky3022.asesment1.ui.screen.Paths
+import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
+import com.dzaky3022.asesment1.ui.screen.visual.Paths
 
 
 @Composable

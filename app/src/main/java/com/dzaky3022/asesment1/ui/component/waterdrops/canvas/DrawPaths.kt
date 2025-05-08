@@ -8,12 +8,11 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.sp
 import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.ui.theme.*
-import com.dzaky3022.asesment1.ui.screen.Paths
+import com.dzaky3022.asesment1.ui.screen.visual.Paths
 import com.dzaky3022.asesment1.ui.component.waterdrops.text.TextParams
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 

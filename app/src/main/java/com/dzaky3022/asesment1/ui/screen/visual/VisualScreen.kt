@@ -1,4 +1,4 @@
-package com.dzaky3022.asesment1.ui.screen
+package com.dzaky3022.asesment1.ui.screen.visual
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas

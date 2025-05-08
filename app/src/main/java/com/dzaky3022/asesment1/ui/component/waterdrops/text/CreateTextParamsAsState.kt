@@ -16,7 +16,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.dzaky3022.asesment1.utils.toPx
-import com.dzaky3022.asesment1.ui.screen.ElementParams
+import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
 import java.math.RoundingMode
 
 @Composable

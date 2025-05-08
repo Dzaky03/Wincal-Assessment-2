@@ -1,4 +1,4 @@
-package com.dzaky3022.asesment1.ui.screen
+package com.dzaky3022.asesment1.ui.screen.form
 
 import android.content.Context
 import android.widget.Toast

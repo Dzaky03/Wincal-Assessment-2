@@ -1,4 +1,4 @@
-package com.dzaky3022.asesment1.ui.screen
+package com.dzaky3022.asesment1.ui.screen.dashboard
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -46,6 +46,7 @@ import com.dzaky3022.asesment1.ui.theme.WhiteTitle
 fun DashboardScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    dashboardViewModel: Dashboard
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
