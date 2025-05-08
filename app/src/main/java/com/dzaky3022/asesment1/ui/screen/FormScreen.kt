@@ -103,7 +103,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
         }
     }
 
-    Scaffold(
+        Scaffold(
         modifier = modifier,
         containerColor = BackgroundLight,
         topBar = {
@@ -466,6 +466,5 @@ fun convertToML(amount: Double, unit: WaterUnit): Double {
         WaterUnit.oz -> amount * 29.5735
         WaterUnit.glasses -> amount * 250
         WaterUnit.ml -> amount
-        else -> 0.0
     }
 }
