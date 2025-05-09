@@ -15,6 +15,7 @@
     <string name="activity_level">"Activity Level"</string>
     <string name="weight">"Weight"</string>
     <string name="room_temp">"Room Temperature"</string>
+    <string name="email">"Email"</string>
     <string name="tap_to_continue">Tap to continue...</string>
     <string name="the_amount_you_need_today_is">"The amount you need today is&#160;"</string>
     <string name="you_ve_consumed">"You've consumed&#160;"</string>
@@ -42,4 +43,13 @@
     <string name="out_of_your_recommended_amount">Out of the recommended amount.</string>
     <string name="simple_view">Simple View</string>
     <string name="visualized_view">Visualized View</string>
+    <string name="logout_success">Logout: Success</string>
+    <string name="logout_failed">Logout: Failed</string>
+    <string name="see_history">See history</string>
+    <string name="update_data_success">Update Data: Success</string>
+    <string name="update_data_failed">Update Data: Failed</string>
+    <string name="list_calculation_results">List Calculation Results</string>
+    <string name="profile_icon">Profile Icon</string>
+    <string name="insert_data_success">Insert Data: Success</string>
+    <string name="insert_data_failed">Insert Data: Failed</string>
 </resources>

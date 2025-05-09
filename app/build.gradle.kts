@@ -57,6 +57,7 @@ dependencies {
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.gson)
+    implementation(libs.threetenabp)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

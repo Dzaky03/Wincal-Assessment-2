@@ -22,7 +22,13 @@ import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText
 import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams
 import com.dzaky3022.asesment1.ui.model.WaterResult
 import com.dzaky3022.asesment1.ui.screen.dashboard.DashboardScreen
+import com.dzaky3022.asesment1.ui.screen.dashboard.DashboardViewModel
+import com.dzaky3022.asesment1.ui.screen.deleted_list.DeletedListViewModel
 import com.dzaky3022.asesment1.ui.screen.form.FormScreen
+import com.dzaky3022.asesment1.ui.screen.deleted_list.DeletedListScreen
+import com.dzaky3022.asesment1.ui.screen.form.FormViewModel
+import com.dzaky3022.asesment1.ui.screen.list.ListScreen
+import com.dzaky3022.asesment1.ui.screen.list.ListViewModel
 import com.dzaky3022.asesment1.ui.screen.visual.VisualScreen
 import com.dzaky3022.asesment1.ui.theme.Poppins
 import com.dzaky3022.asesment1.ui.theme.Water
@@ -30,7 +36,12 @@ import com.dzaky3022.asesment1.utils.Enums.*
 import com.dzaky3022.asesment1.waveGap
 
 @Composable
-fun NavGraph() {
+fun NavGraph(
+    dashboardViewModel: DashboardViewModel,
+    listViewModel: ListViewModel,
+    deletedListViewModel: DeletedListViewModel,
+    formViewModel: FormViewModel,
+) {
     val navController = rememberNavController()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     val points = remember { screenWidth / waveGap }
@@ -50,6 +61,7 @@ fun NavGraph() {
         {
             DashboardScreen(
                 navController = navController,
+                dashboardViewModel = dashboardViewModel,
             )
         }
         composable(Screen.Form.route,
@@ -62,6 +74,7 @@ fun NavGraph() {
         ) {
             FormScreen(
                 navController = navController,
+                formViewModel = formViewModel,
             )
         }
         composable(Screen.Visual.route, arguments = listOf(
@@ -131,6 +144,32 @@ fun NavGraph() {
                     )
                 )
             }
+        }
+        composable(Screen.List.route,
+            enterTransition = {
+                scaleIn(initialScale = 0.8f) + fadeIn()
+            },
+            exitTransition = {
+                scaleOut(targetScale = 1.2f) + fadeOut()
+            }
+        ) {
+            ListScreen(
+                navController = navController,
+                listViewModel = listViewModel,
+            )
+        }
+        composable(Screen.DeletedList.route,
+            enterTransition = {
+                scaleIn(initialScale = 0.8f) + fadeIn()
+            },
+            exitTransition = {
+                scaleOut(targetScale = 1.2f) + fadeOut()
+            }
+        ) {
+            DeletedListScreen(
+                navController = navController,
+                deletedListViewModel = deletedListViewModel,
+            )
         }
     }
 }

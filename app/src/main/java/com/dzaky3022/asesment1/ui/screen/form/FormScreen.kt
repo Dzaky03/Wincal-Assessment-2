@@ -45,6 +45,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,13 +73,14 @@ import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Danger
 import com.dzaky3022.asesment1.ui.theme.Gray
 import com.dzaky3022.asesment1.ui.theme.IconBackgroundGray
+import com.dzaky3022.asesment1.utils.Enums
 import com.dzaky3022.asesment1.utils.Enums.*
-import java.math.RoundingMode
+import com.dzaky3022.asesment1.utils.roundUpTwoDecimals
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) {
+fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, formViewModel: FormViewModel,) {
     val context = LocalContext.current
     var weight by rememberSaveable { mutableStateOf("") }
     var weightUnit by rememberSaveable { mutableStateOf(WeightUnit.Kilogram) }
@@ -91,7 +93,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
     var waterUnit by rememberSaveable { mutableStateOf(WaterUnit.ml) }
     var isNext by rememberSaveable { mutableStateOf(false) }
 
-
+    val insertStatus by formViewModel.insertStatus.collectAsState()
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
 
@@ -103,7 +105,12 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
         }
     }
 
-        Scaffold(
+    LaunchedEffect(insertStatus) {
+        if (insertStatus != Enums.ResponseStatus.Idle)
+            Toast.makeText(context, insertStatus.message, Toast.LENGTH_SHORT).show()
+    }
+
+    Scaffold(
         modifier = modifier,
         containerColor = BackgroundLight,
         topBar = {
@@ -178,7 +185,10 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                             isRequired = true,
                             isDigitOnly = true,
                             label = stringResource(R.string.room_temp),
-                            hint = stringResource(R.string.enter_your, stringResource(R.string.room_temp)),
+                            hint = stringResource(
+                                R.string.enter_your,
+                                stringResource(R.string.room_temp)
+                            ),
                             initialValue = temp,
                             onChange = { temp = it },
                             isSuffixDropdown = true,
@@ -193,7 +203,10 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                             isRequired = true,
                             isDigitOnly = true,
                             label = stringResource(R.string.weight),
-                            hint = stringResource(R.string.enter_your, stringResource(R.string.weight)),
+                            hint = stringResource(
+                                R.string.enter_your,
+                                stringResource(R.string.weight)
+                            ),
                             initialValue = weight,
                             onChange = { weight = it },
                             isSuffixDropdown = true,
@@ -212,7 +225,7 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                         )
                         RadioButtonGroup(
                             context = context,
-                            label =stringResource(R.string.gender),
+                            label = stringResource(R.string.gender),
                             direction = Direction.Horizontal,
                             options = Gender.entries,
                             selectedOption = gender,
@@ -235,20 +248,23 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController) 
                                     tempUnit,
                                     weightUnit,
                                     activityLevel
-                                ).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-                                    .toFloat()
+                                ).roundUpTwoDecimals()
+                                val waterResult = WaterResult(
+                                    amount = convertToML(
+                                        drinkAmount.toDouble(),
+                                        waterUnit
+                                    ).roundUpTwoDecimals(),
+                                    resultValue = value,
+                                    roomTemp = temp.toFloat(),
+                                    gender = gender,
+                                    weight = weight.toFloat(),
+                                    activityLevel = activityLevel,
+                                    percentage = 0f,
+                                )
+                                formViewModel.insert(waterResult = waterResult, context = context)
                                 navController.navigate(
                                     Screen.Visual.withValue(
-                                        WaterResult(
-                                            amount = convertToML(drinkAmount.toDouble(), waterUnit).toBigDecimal()
-                                                .setScale(2, RoundingMode.HALF_UP).toFloat(),
-                                            resultValue = value,
-                                            roomTemp = temp.toFloat(),
-                                            gender = gender,
-                                            weight = weight.toFloat(),
-                                            activityLevel = activityLevel,
-                                            percentage = 0f,
-                                        )
+                                        waterResult = waterResult
                                     )
                                 )
                             },

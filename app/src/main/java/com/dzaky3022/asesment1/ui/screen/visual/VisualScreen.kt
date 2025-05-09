@@ -1,10 +1,13 @@
 package com.dzaky3022.asesment1.ui.screen.visual
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,10 +20,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,6 +74,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.drawToBitmap
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
+import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.animating.WaterLevelState
 import com.dzaky3022.asesment1.ui.component.animating.waveProgressAsState
 import com.dzaky3022.asesment1.ui.component.waterdrops.canvas.drawTextWithBlendMode
@@ -82,6 +89,7 @@ import com.dzaky3022.asesment1.ui.component.waterdrops.wave.createAnimationsAsSt
 import com.dzaky3022.asesment1.ui.model.WaterResult
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.BackgroundLight
+import com.dzaky3022.asesment1.ui.theme.IconBackgroundGray
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.ui.theme.WhiteTitle
 import com.dzaky3022.asesment1.utils.Enums.ScreenState
@@ -203,8 +211,8 @@ fun WavesDrawing(
     }
     LaunchedEffect(waveProgress) {
         if (waveProgress >=
-                (waterResult?.percentage ?: 0f)/100
-            )
+            (waterResult?.percentage ?: 0f) / 100
+        )
             onWaterAnimated(WaterLevelState.Done)
     }
     LaunchedEffect(waterLevelState) {
@@ -417,7 +425,7 @@ fun WavesDrawing(
                                     currentScreenState = ScreenState.SecondScreen
                                 }
                         ) {
-                            EndScreenView(waveProgress, isSimpleView)
+                            EndScreenView(waveProgress, isSimpleView, navController)
                         }
                     }
                 }
@@ -524,7 +532,7 @@ fun WavesDrawing(
                             color = WhiteTitle,
                         )
                         Spacer(Modifier.height(32.dp))
-                        EndScreenView(waveProgress, isSimpleView)
+                        EndScreenView(waveProgress, isSimpleView, navController)
                     }
                 }
         }
@@ -532,7 +540,10 @@ fun WavesDrawing(
 }
 
 @Composable
-fun EndScreenView(waveProgress: Float, isSimpleView: Boolean) {
+fun EndScreenView(waveProgress: Float, isSimpleView: Boolean, navController: NavHostController) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -572,6 +583,34 @@ fun EndScreenView(waveProgress: Float, isSimpleView: Boolean) {
             fontSize = 14.sp,
             textAlign = TextAlign.Center,
         )
+        Spacer(Modifier.height(24.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = {
+                    navController.navigate(Screen.List.route)
+                },
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = if (isPressed) BackgroundDark else Color.White,
+                    disabledContainerColor = IconBackgroundGray
+                ),
+                border = BorderStroke(1.dp, Color.White),
+                interactionSource = interactionSource,
+            ) {
+                Text(
+                    text = stringResource(R.string.see_history),
+                    fontSize = 16.sp,
+                    color = if (isPressed) Color.White else BackgroundDark,
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        }
         Spacer(Modifier.height(42.dp))
         if (!isSimpleView)
             Text(
@@ -586,7 +625,7 @@ fun EndScreenView(waveProgress: Float, isSimpleView: Boolean) {
 }
 
 @Composable
-fun MoreMenu(
+private fun MoreMenu(
     modifier: Modifier = Modifier,
     expanded: Boolean,
     isSimpleView: Boolean,

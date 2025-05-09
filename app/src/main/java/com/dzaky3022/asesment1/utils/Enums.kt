@@ -43,4 +43,22 @@ class Enums {
         SecondScreen,
         ThirdScreen,
     }
+    enum class OrientationView {
+        List,
+        Grid,
+    }
+    enum class DataStatus {
+        Deleted,
+        Available,
+    }
+    enum class ResponseStatus(var message: String? = null) {
+        Success,
+        Failed,
+        Idle,
+        Loading;
+
+        fun updateMessage(message: String? = null) {
+            this.message = message
+        }
+    }
 }

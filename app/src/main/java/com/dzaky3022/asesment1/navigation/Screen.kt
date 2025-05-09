@@ -17,4 +17,6 @@ sealed class Screen(val route: String) {
         fun withValue(waterResult: WaterResult) =
             "visual/amount/${waterResult.amount}/result/${waterResult.resultValue}/temp/${waterResult.roomTemp}/actlvl/${waterResult.activityLevel.name}/gender/${waterResult.gender.name}/weight/${waterResult.weight}"
     }
+    data object List : Screen("list")
+    data object DeletedList : Screen("deleted-list")
 }

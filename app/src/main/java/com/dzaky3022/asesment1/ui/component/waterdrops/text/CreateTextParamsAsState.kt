@@ -17,6 +17,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
 import com.dzaky3022.asesment1.utils.toPx
 import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
+import com.dzaky3022.asesment1.utils.roundUpTwoDecimals
 import java.math.RoundingMode
 
 @Composable
@@ -29,7 +30,7 @@ fun createTextParamsAsState(
     val unitTextStyle = remember(textStyle) { textStyle.copy(fontSize = textStyle.fontSize / 2) }
 
     val text by remember(waveProgress) {
-        mutableStateOf((waveProgress * 100).toBigDecimal().setScale(2, RoundingMode.HALF_UP).toString())
+        mutableStateOf((waveProgress * 100).roundUpTwoDecimals().toString())
     }
 
     val textProgressSize by remember(text) {

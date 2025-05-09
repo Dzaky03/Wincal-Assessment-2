@@ -4,15 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.dzaky3022.asesment1.ui.model.DeletedResult
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.model.WaterResult
 
 @Database(entities = [User::class, WaterResult::class, DeletedResult::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
-    abstract fun savedData(): SavedDataDao
-    abstract fun deletedData(): DeletedDataDao
+    abstract fun waterResultDao(): WaterResultDao
 
     companion object {
         @Volatile

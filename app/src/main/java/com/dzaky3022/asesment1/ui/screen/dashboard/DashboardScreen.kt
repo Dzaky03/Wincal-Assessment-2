@@ -6,8 +6,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,6 +35,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -39,15 +43,24 @@ import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.R
+import com.dzaky3022.asesment1.ui.component.CustomInput
+import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.theme.WhiteCaption
 import com.dzaky3022.asesment1.ui.theme.WhiteTitle
+import com.dzaky3022.asesment1.utils.Enums.ActivityLevel
+import com.dzaky3022.asesment1.utils.Enums.Direction
+import com.dzaky3022.asesment1.utils.Enums.Gender
+import com.dzaky3022.asesment1.utils.Enums.TempUnit
+import com.dzaky3022.asesment1.utils.Enums.WeightUnit
 
 @Composable
 fun DashboardScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    dashboardViewModel: Dashboard
+    dashboardViewModel: DashboardViewModel,
 ) {
+    val user by dashboardViewModel.user.collectAsState()
+    val isUserExisted by dashboardViewModel.isUserExisted.collectAsState()
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
     var isPressed2 by remember { mutableStateOf(false) }
@@ -100,11 +113,46 @@ fun DashboardScreen(
                     blendMode = BlendMode.SrcIn
                 )
             )
+            if (!isUserExisted)
+                Column {
+                    CustomInput<String>(
+                        isRequired = true,
+                        label = stringResource(R.string.email),
+                        hint = stringResource(
+                            R.string.enter_your,
+                            stringResource(R.string.email)
+                        ),
+                        initialValue = user?.nama ?: "",
+                        onChange = { email ->
+                            dashboardViewModel.onChange(
+                                (user ?: User()).copy(email = email)
+                            )
+                        },
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    CustomInput<String>(
+                        isRequired = true,
+                        label = stringResource(R.string.room_temp),
+                        hint = stringResource(
+                            R.string.enter_your,
+                            stringResource(R.string.room_temp)
+                        ),
+                        initialValue = user?.nama ?: "",
+                        onChange = { nama ->
+                            dashboardViewModel.onChange(
+                                (user ?: User()).copy(nama = nama)
+                            )
+                        },
+                    )
+                }
             Button(
+                enabled = user != null,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
                     navController.navigate(Screen.Form.route)
+                    if (!isUserExisted)
+                        dashboardViewModel.saveUser()
                 },
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (isPressed) Color.White else Water,

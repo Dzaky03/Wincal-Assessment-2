@@ -16,6 +16,7 @@
     <string name="activity_level">Tingkat aktivitas</string>
     <string name="weight">Berat</string>
     <string name="room_temp">Suhu Ruang</string>
+    <string name="email">Email</string>
     <string name="tap_to_continue">Ketuk untuk melanjutkan...</string>
     <string name="the_amount_you_need_today_is">Jumlah yang dibutuhkan adalah&#160;</string>
     <string name="you_ve_consumed">Anda telah mengonsumsi sebanyak&#160;</string>
@@ -43,4 +44,7 @@
     <string name="out_of_your_recommended_amount">Dari jumlah yang direkomendasikan.</string>
     <string name="simple_view">Tampilan Sederhana</string>
     <string name="visualized_view">Tampilan Visual</string>
+    <string name="logout_success">Logout: Berhasil</string>
+    <string name="logout_failed">Logout: Gagal</string>
+    <string name="see_history">Lihat riwayat</string>
 </resources>

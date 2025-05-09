@@ -1,0 +1,100 @@
+package com.dzaky3022.asesment1.ui.component
+
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults.cardColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.dzaky3022.asesment1.R
+import com.dzaky3022.asesment1.ui.model.User
+import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.BackgroundLight
+import com.dzaky3022.asesment1.ui.theme.WhiteTitle
+
+@Composable
+fun ProfilDialog(
+    user: User,
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit
+) {
+    Dialog(onDismissRequest = { onDismissRequest() }) {
+        Card(
+            modifier = Modifier.padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = cardColors(containerColor = BackgroundLight, contentColor = BackgroundDark)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.baseline_account_circle_24),
+                    contentDescription = stringResource(R.string.profile_icon),
+                    modifier = Modifier.size(100.dp).clip(CircleShape)
+                )
+                Text(
+                    text = user.nama ?: "",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 16.dp),
+                )
+                Text(
+                    text = user.email ?: "",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(
+                        onClick = { onDismissRequest() },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, WhiteTitle)
+                    ) {
+                        Text(text = "Close", color = WhiteTitle, fontSize = 14.sp)
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    OutlinedButton(
+                        onClick = { onConfirmation() },
+                        modifier = Modifier.weight(1f),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                    ) {
+                        Text(text = "Logout", color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
+                    }
+                }
+            }
+        }
+    }
+}

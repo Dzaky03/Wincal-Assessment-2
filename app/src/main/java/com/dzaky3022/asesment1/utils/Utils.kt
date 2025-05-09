@@ -1,5 +1,6 @@
 package com.dzaky3022.asesment1.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -11,9 +12,13 @@ import androidx.core.content.FileProvider
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
+import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
 import java.io.File
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.util.Locale
 import kotlin.math.pow
 
 fun isAboveElement(waterLevel: Int, bufferY: Float, position: Offset) =
@@ -115,8 +120,23 @@ fun shareData(context: Context, bitmap: Bitmap, caption: String) {
 }
 
 
-fun roundUpTwoDecimals(value: Float): Float {
-    return BigDecimal(value.toString())
-        .setScale(2, RoundingMode.UP)
+fun Float.roundUpTwoDecimals(): Float {
+    return BigDecimal(this.toString())
+        .setScale(2, RoundingMode.HALF_UP)
         .toFloat()
+}
+
+fun Double.roundUpTwoDecimals(): Float {
+    return BigDecimal(this.toString())
+        .setScale(2, RoundingMode.HALF_UP)
+        .toFloat()
+}
+
+fun Instant.toFormattedDate(locale: Locale): String =
+    formatDate(this, locale)
+
+fun formatDate(instant: Instant, locale: Locale): String {
+    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy", locale)
+        .withZone(ZoneId.systemDefault())
+    return formatter.format(instant)
 }
