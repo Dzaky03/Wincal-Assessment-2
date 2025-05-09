@@ -51,7 +51,6 @@
     <string name="update_data_failed">Update Data: Failed</string>
     <string name="list_calculation_results">List Calculation Results</string>
     <string name="profile_icon">Profile Icon</string>
-    <string name="insert_data_success">Insert Data: Success</string>
     <string name="insert_data_failed">Insert Data: Failed</string>
     <string name="name">Name</string>
     <string name="restore_data_success">Restore Data: Success</string>
@@ -75,10 +74,11 @@
     <string name="incorrect_email_format">Incorrect email format.</string>
     <string name="login_success">Login: Success</string>
     <string name="login_failed">Login: Failed</string>
-    <string name="register_success">Register: Success</string>
     <string name="register_failed">Register: Failed</string>
     <string name="delete_account_success">Delete Account: Success</string>
     <string name="delete_account_failed">Delete Account: Failed</string>
     <string name="delete_account">Delete Account</string>
     <string name="delete_your_account">Delete your account?</string>
+    <string name="insert_data_success">Insert Data: Success</string>
+    <string name="register_success">Register: Success</string>
 </resources>
