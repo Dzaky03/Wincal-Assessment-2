@@ -28,6 +28,22 @@ interface WaterResultDao {
 """)
     suspend fun deleteById(id: String, status: Enums.DataStatus = Enums.DataStatus.Deleted): Int
 
+    @Query("""
+    UPDATE water_results SET 
+        dataStatus = :status
+    WHERE id = :id
+""")
+    suspend fun restoreById(id: String, status: Enums.DataStatus = Enums.DataStatus.Available): Int
+
     @Query("DELETE FROM water_results WHERE id = :waterResultId")
     suspend fun deletePermanent(waterResultId: String): Int
+
+    @Query("SELECT * FROM water_results WHERE id = :id LIMIT 1")
+    suspend fun getDataById(id: String): WaterResult?
+
+    @Query("""
+    SELECT * FROM water_results
+    WHERE uid = :uid AND (:status IS NULL OR dataStatus = :status)
+""")
+    suspend fun getDataByUser(uid: String, status: Enums.DataStatus? = null): List<WaterResult>?
 }

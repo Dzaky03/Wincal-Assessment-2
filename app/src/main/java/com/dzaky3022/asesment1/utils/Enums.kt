@@ -51,13 +51,13 @@ class Enums {
         Deleted,
         Available,
     }
-    enum class ResponseStatus(var message: String? = null) {
+    enum class ResponseStatus(var message: String = "") {
         Success,
         Failed,
         Idle,
         Loading;
 
-        fun updateMessage(message: String? = null) {
+        fun updateMessage(message: String = "") {
             this.message = message
         }
     }

@@ -13,34 +13,40 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.dzaky3022.asesment1.database.WaterResultDao
 import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaterDropText
 import com.dzaky3022.asesment1.ui.component.waterdrops.wave.WaveParams
+import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.model.WaterResult
 import com.dzaky3022.asesment1.ui.screen.dashboard.DashboardScreen
 import com.dzaky3022.asesment1.ui.screen.dashboard.DashboardViewModel
+import com.dzaky3022.asesment1.ui.screen.deleted_list.DeletedListScreen
 import com.dzaky3022.asesment1.ui.screen.deleted_list.DeletedListViewModel
 import com.dzaky3022.asesment1.ui.screen.form.FormScreen
-import com.dzaky3022.asesment1.ui.screen.deleted_list.DeletedListScreen
-import com.dzaky3022.asesment1.ui.screen.form.FormViewModel
 import com.dzaky3022.asesment1.ui.screen.list.ListScreen
 import com.dzaky3022.asesment1.ui.screen.list.ListViewModel
 import com.dzaky3022.asesment1.ui.screen.visual.VisualScreen
 import com.dzaky3022.asesment1.ui.theme.Poppins
 import com.dzaky3022.asesment1.ui.theme.Water
-import com.dzaky3022.asesment1.utils.Enums.*
+import com.dzaky3022.asesment1.utils.Enums.ActivityLevel
+import com.dzaky3022.asesment1.utils.Enums.Gender
+import com.dzaky3022.asesment1.utils.ViewModelFactory
 import com.dzaky3022.asesment1.waveGap
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun NavGraph(
     dashboardViewModel: DashboardViewModel,
     listViewModel: ListViewModel,
     deletedListViewModel: DeletedListViewModel,
-    formViewModel: FormViewModel,
+    waterResultDao: WaterResultDao,
+    localUser: StateFlow<User?>,
 ) {
     val navController = rememberNavController()
     val screenWidth = LocalConfiguration.current.screenWidthDp
@@ -74,7 +80,38 @@ fun NavGraph(
         ) {
             FormScreen(
                 navController = navController,
-                formViewModel = formViewModel,
+                formViewModel = viewModel(
+                    factory = ViewModelFactory(
+                        localUser = localUser,
+                        waterResultDao = waterResultDao,
+                    )
+                ),
+            )
+        }
+        composable(Screen.UpdateForm.route,
+            arguments = listOf(
+                navArgument(KEY_DATA_ID) {
+                    type = NavType.StringType
+                },
+            ),
+            enterTransition = {
+                scaleIn(initialScale = 0.8f) + fadeIn()
+            },
+            exitTransition = {
+                scaleOut(targetScale = 1.2f) + fadeOut()
+            }
+        ) {
+            val dataId = it.arguments?.getString(KEY_DATA_ID) ?: ""
+
+            FormScreen(
+                navController = navController,
+                formViewModel = viewModel(
+                    factory = ViewModelFactory(
+                        localUser = localUser,
+                        waterResultId = dataId,
+                        waterResultDao = waterResultDao,
+                    )
+                ),
             )
         }
         composable(Screen.Visual.route, arguments = listOf(
@@ -115,7 +152,7 @@ fun NavGraph(
             val activityLevel = ActivityLevel.valueOf(actLvl)
             val genderEnum = Gender.valueOf(gender)
             val waterResult = WaterResult(
-                amount = amount,
+                drinkAmount = amount,
                 resultValue = resultValue,
                 roomTemp = temp,
                 activityLevel = activityLevel,

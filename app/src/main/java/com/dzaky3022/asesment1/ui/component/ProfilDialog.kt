@@ -7,18 +7,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults.cardColors
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,13 +34,14 @@ import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.BackgroundLight
-import com.dzaky3022.asesment1.ui.theme.WhiteTitle
+import com.dzaky3022.asesment1.ui.theme.Danger
 
 @Composable
 fun ProfilDialog(
     user: User,
     onDismissRequest: () -> Unit,
-    onConfirmation: () -> Unit
+    onLogout: () -> Unit,
+    onDeleteAccount: () -> Unit,
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -58,7 +56,9 @@ fun ProfilDialog(
                 Image(
                     painter = painterResource(R.drawable.baseline_account_circle_24),
                     contentDescription = stringResource(R.string.profile_icon),
-                    modifier = Modifier.size(100.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
                 )
                 Text(
                     text = user.nama ?: "",
@@ -79,20 +79,35 @@ fun ProfilDialog(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     OutlinedButton(
-                        onClick = { onDismissRequest() },
+                        onClick = onDismissRequest,
                         modifier = Modifier.weight(1f),
-                        border = BorderStroke(1.dp, WhiteTitle)
+                        border = BorderStroke(1.dp, BackgroundDark)
                     ) {
-                        Text(text = "Close", color = WhiteTitle, fontSize = 14.sp)
+                        Text(
+                            text = stringResource(R.string.close),
+                            color = BackgroundDark,
+                            fontSize = 14.sp
+                        )
                     }
                     Spacer(Modifier.width(10.dp))
                     OutlinedButton(
-                        onClick = { onConfirmation() },
+                        onClick = onLogout,
                         modifier = Modifier.weight(1f),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+                        border = BorderStroke(1.dp, Danger)
                     ) {
-                        Text(text = "Logout", color = MaterialTheme.colorScheme.error, fontSize = 14.sp)
+                        Text(
+                            text = stringResource(R.string.logout),
+                            color = Danger,
+                            fontSize = 14.sp
+                        )
                     }
+                }
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onDeleteAccount,
+                    colors = buttonColors(containerColor = Danger)
+                ) {
+                    Text(text = stringResource(R.string.delete_account), color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
                 }
             }
         }

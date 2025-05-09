@@ -7,27 +7,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.PersonOutline
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,12 +49,11 @@ import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.EmptyState
 import com.dzaky3022.asesment1.ui.component.ProfilDialog
 import com.dzaky3022.asesment1.ui.component.PullToRefreshContainer
-import com.dzaky3022.asesment1.ui.model.WaterResult
+import com.dzaky3022.asesment1.ui.component.WarningDialog
+import com.dzaky3022.asesment1.ui.component.WaterResultItem
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
-import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.utils.Enums
-import com.dzaky3022.asesment1.utils.toFormattedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,31 +62,83 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
     val logoutStatus by listViewModel.logOutStatus.collectAsState()
     val listData by listViewModel.listData.collectAsState()
     val loadStatus by listViewModel.loadStatus.collectAsState()
+    val deleteStatus by listViewModel.deleteStatus.collectAsState()
+    val deleteAccountStatus by listViewModel.deleteAccountStatus.collectAsState()
     val userData by listViewModel.userData.collectAsState()
-    val updateStatus by listViewModel.updateStatus.collectAsState()
+    val orientationView by listViewModel.orientationView.collectAsState()
     var showProfileDialog by rememberSaveable { mutableStateOf(false) }
-    var showUpdateDialog by rememberSaveable { mutableStateOf(false to "") }
-    var orientationView by rememberSaveable { mutableStateOf(Enums.OrientationView.List) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false to "") }
+    var showDeleteAccountDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showProfileDialog)
         userData?.let {
             ProfilDialog(
                 user = it,
-                onDismissRequest = { showProfileDialog = false }
+                onDismissRequest = { showProfileDialog = false },
+                onLogout =  {
+                    showProfileDialog = false
+                    listViewModel.logout(context)
+                }
             ) {
-                showProfileDialog = false
-                listViewModel.logout(context)
+                    showProfileDialog = false
+                showDeleteAccountDialog = true
             }
         }
+
+    if (showDeleteDialog.first)
+        WarningDialog(
+            onDismissRequest = {
+                showDeleteDialog = false to showDeleteDialog.second
+            }) {
+            listViewModel.deleteData(showDeleteDialog.second, context)
+            showDeleteDialog = false to ""
+        }
+
+    if (showDeleteAccountDialog)
+        WarningDialog(
+            label = stringResource(R.string.delete_your_account),
+            onDismissRequest = {
+                showDeleteAccountDialog = false
+            }) {
+            showDeleteAccountDialog = false
+            listViewModel.deleteAccount(context)
+        }
+
+    LaunchedEffect(deleteStatus) {
+        if (deleteStatus != Enums.ResponseStatus.Idle) {
+            Toast.makeText(context, deleteStatus.message, Toast.LENGTH_SHORT).show()
+            listViewModel.reset()
+        }
+    }
 
     LaunchedEffect(logoutStatus) {
         if (logoutStatus != Enums.ResponseStatus.Idle)
             Toast.makeText(context, logoutStatus.message, Toast.LENGTH_SHORT).show()
+
+        if (logoutStatus == Enums.ResponseStatus.Success) {
+            navController.popBackStack(
+                route = navController.graph.startDestinationRoute ?: "",
+                inclusive = false
+            )
+            listViewModel.reset()
+        }
     }
 
-    LaunchedEffect(updateStatus) {
-        if (updateStatus != Enums.ResponseStatus.Idle)
-            Toast.makeText(context, updateStatus.message, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(deleteAccountStatus) {
+        if (deleteAccountStatus != Enums.ResponseStatus.Idle)
+            Toast.makeText(context, deleteAccountStatus.message, Toast.LENGTH_SHORT).show()
+
+        if (deleteAccountStatus == Enums.ResponseStatus.Success) {
+            navController.popBackStack(
+                route = navController.graph.startDestinationRoute ?: "",
+                inclusive = false
+            )
+            listViewModel.reset()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        listViewModel.getList()
     }
 
     PullToRefreshContainer(
@@ -137,7 +180,7 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                             Icon(
                                 imageVector = Icons.Default.PersonOutline,
                                 contentDescription = stringResource(R.string.profile_icon),
-                                tint = Color.White,
+                                tint = BackgroundDark,
                             )
                         }
                     },
@@ -166,8 +209,9 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                         Text("View deleted data...", fontSize = 14.sp, color = Color.Gray)
                     }
                     IconButton(onClick = {
-                        orientationView =
+                        listViewModel.changeOrientationView(
                             if (orientationView == Enums.OrientationView.List) Enums.OrientationView.Grid else Enums.OrientationView.List
+                        )
                     }) {
                         Icon(
                             imageVector = if (orientationView == Enums.OrientationView.List) Icons.Default.GridView else Icons.AutoMirrored.Filled.List,
@@ -175,7 +219,7 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                         )
                     }
                 }
-                if (listData.isNullOrEmpty()) {
+                if (listData.isNullOrEmpty() || loadStatus == Enums.ResponseStatus.Loading) {
                     EmptyState(
                         isLoading = loadStatus == Enums.ResponseStatus.Loading
                     )
@@ -187,14 +231,15 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                                 contentPadding = PaddingValues(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(listData!!) { item ->
+                                itemsIndexed(listData!!) { index, item ->
                                     WaterResultItem(
+                                        label = "Data ${index + 1}",
                                         item = item,
-                                        onEdit = { id ->
-                                            showUpdateDialog = true to id
+                                        onEditOrRestore = { id ->
+                                            navController.navigate(Screen.UpdateForm.withId(id))
                                         }
                                     ) { id ->
-                                        listViewModel.deleteData(id)
+                                        showDeleteDialog = true to id
                                     }
                                 }
                             }
@@ -208,75 +253,19 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(listData!!) { item ->
-                                    WaterResultItem(item = item, onEdit = { id ->
-                                        showUpdateDialog = true to id
-                                    }) { id ->
-                                        listViewModel.deleteData(id)
+                                itemsIndexed(listData!!) { index, item ->
+                                    WaterResultItem(
+                                        label = "Data ${index + 1}",
+                                        item = item,
+                                        onEditOrRestore = { id ->
+                                            navController.navigate(Screen.UpdateForm.withId(id))
+                                        }) { id ->
+                                        showDeleteDialog = true to id
                                     }
                                 }
                             }
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WaterResultItem(item: WaterResult, onEdit: (String) -> Unit, onDelete: (String) -> Unit) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = cardColors(containerColor = BackgroundLight)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.Center)) {
-                Text("Room Temp: ${item.roomTemp}°C")
-                Text("Weight: ${item.weight} kg")
-                Text("Activity Level: ${item.activityLevel}")
-                Text("Amount: ${item.amount} ml")
-                Text("Result Value: ${item.resultValue}")
-                Text("Percentage: ${item.percentage}%")
-                Text("Gender: ${item.gender}")
-                item.createdAt?.let {
-                    Text("Created At: ${it.toFormattedDate(java.util.Locale.getDefault())}")
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp)
-            ) {
-                IconButton(
-                    onClick = {
-                        onDelete(item.id)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
-                Spacer(Modifier.width(24.dp))
-                IconButton(
-                    onClick = {
-                        onEdit(item.id)
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit",
-                        tint = BackgroundDark
-                    )
                 }
             }
         }

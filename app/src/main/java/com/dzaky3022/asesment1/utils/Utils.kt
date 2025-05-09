@@ -1,6 +1,5 @@
 package com.dzaky3022.asesment1.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap

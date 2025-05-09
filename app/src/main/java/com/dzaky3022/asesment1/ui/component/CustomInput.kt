@@ -4,11 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -46,10 +42,14 @@ import com.dzaky3022.asesment1.ui.theme.Gray
 @Composable
 fun <T> CustomInput(
     label: String = "",
+    labelColor: Color = Color.Black,
+    textColor: Color = Color.Black,
     hint: String,
     helperText: String? = null,
+    helperTextColor: Color? = null,
     initialValue: String = "",
     isEnabled: Boolean = true,
+    isEmail: Boolean = false,
     isDigitOnly: Boolean = false,
     isRequired: Boolean = false,
     maxLength: Int? = null,
@@ -74,7 +74,7 @@ fun <T> CustomInput(
                 Text(
                     text = label,
                     fontSize = 14.sp,
-                    color = Color.Black,
+                    color = labelColor,
                     modifier = Modifier.padding(bottom = 4.dp),
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -113,11 +113,12 @@ fun <T> CustomInput(
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = when {
                     isDigitOnly -> KeyboardType.Number
+                    isEmail -> KeyboardType.Email
                     else -> KeyboardType.Text
                 },
                 imeAction = imeAction
             ),
-            textStyle = LocalTextStyle.current.copy(fontSize = 16.sp),
+            textStyle = LocalTextStyle.current.copy(fontSize = 16.sp, color = textColor),
             placeholder = { Text(text = hint, color = Color.Gray) },
             modifier = Modifier.fillMaxWidth(),
             suffix = if (isSuffixDropdown) {
@@ -149,7 +150,7 @@ fun <T> CustomInput(
             Text(
                 text = helperText,
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = helperTextColor ?: Color.Gray,
                 modifier = Modifier.padding(top = 4.dp)
             )
         }

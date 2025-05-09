@@ -11,10 +11,17 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.sp
 import com.dzaky3022.asesment1.R
-import com.dzaky3022.asesment1.ui.theme.*
-import com.dzaky3022.asesment1.ui.screen.visual.Paths
 import com.dzaky3022.asesment1.ui.component.waterdrops.text.TextParams
+import com.dzaky3022.asesment1.ui.screen.visual.Paths
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.Danger
+import com.dzaky3022.asesment1.ui.theme.FadeBlue
+import com.dzaky3022.asesment1.ui.theme.FadeGreen
+import com.dzaky3022.asesment1.ui.theme.FadeRed
+import com.dzaky3022.asesment1.ui.theme.FadeYellow
+import com.dzaky3022.asesment1.ui.theme.Success
+import com.dzaky3022.asesment1.ui.theme.Warning
+import com.dzaky3022.asesment1.ui.theme.Water
 
 fun DrawScope.drawWaves(
     paths: Paths,

@@ -68,20 +68,34 @@ import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.CustomInput
 import com.dzaky3022.asesment1.ui.model.WaterResult
-import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Danger
 import com.dzaky3022.asesment1.ui.theme.Gray
 import com.dzaky3022.asesment1.ui.theme.IconBackgroundGray
 import com.dzaky3022.asesment1.utils.Enums
-import com.dzaky3022.asesment1.utils.Enums.*
+import com.dzaky3022.asesment1.utils.Enums.ActivityLevel
+import com.dzaky3022.asesment1.utils.Enums.Direction
+import com.dzaky3022.asesment1.utils.Enums.Gender
+import com.dzaky3022.asesment1.utils.Enums.TempUnit
+import com.dzaky3022.asesment1.utils.Enums.WaterUnit
+import com.dzaky3022.asesment1.utils.Enums.WeightUnit
 import com.dzaky3022.asesment1.utils.roundUpTwoDecimals
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, formViewModel: FormViewModel,) {
+fun FormScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    formViewModel: FormViewModel,
+) {
     val context = LocalContext.current
+    val data by formViewModel.data.collectAsState()
+    val isUpdate by formViewModel.isUpdate.collectAsState()
+    val updateStatus by formViewModel.updateStatus.collectAsState()
+    val isResultDataExist by formViewModel.isDataExist.collectAsState()
+
     var weight by rememberSaveable { mutableStateOf("") }
     var weightUnit by rememberSaveable { mutableStateOf(WeightUnit.Kilogram) }
     var temp by rememberSaveable { mutableStateOf("") }
@@ -95,7 +109,36 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, 
 
     val insertStatus by formViewModel.insertStatus.collectAsState()
     val interactionSource = remember { MutableInteractionSource() }
-    val isPressed = interactionSource.collectIsPressedAsState().value
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    var isModified by remember { mutableStateOf(false) }
+    fun checkIfModified() {
+        isModified = weight != data?.weight?.toString() ||
+                weightUnit != (data?.weightUnit ?: WeightUnit.Kilogram) ||
+                temp != data?.roomTemp?.toString() ||
+                tempUnit != (data?.tempUnit ?: TempUnit.Celsius) ||
+                activityLevel != (data?.activityLevel ?: ActivityLevel.Low) ||
+                gender != (data?.gender ?: Gender.Male) ||
+                waterUnit != (data?.waterUnit ?: WaterUnit.ml) ||
+                drinkAmount != data?.drinkAmount.toString()
+    }
+
+    LaunchedEffect(weight, weightUnit, temp, tempUnit, activityLevel, gender, waterUnit) {
+        checkIfModified()
+    }
+
+    LaunchedEffect(data) {
+        if (data != null) {
+            weight = data?.weight.toString()
+            weightUnit = data?.weightUnit ?: WeightUnit.Kilogram
+            temp = data?.roomTemp.toString()
+            tempUnit = data?.tempUnit ?: TempUnit.Celsius
+            activityLevel = data?.activityLevel ?: ActivityLevel.Low
+            gender = data?.gender ?: Gender.Male
+            waterUnit = data?.waterUnit ?: WaterUnit.ml
+            drinkAmount = data?.drinkAmount.toString()
+        }
+    }
 
     LaunchedEffect(isNext, weight, temp, drinkAmount) {
         isEnabled = if (isNext) {
@@ -108,6 +151,13 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, 
     LaunchedEffect(insertStatus) {
         if (insertStatus != Enums.ResponseStatus.Idle)
             Toast.makeText(context, insertStatus.message, Toast.LENGTH_SHORT).show()
+        formViewModel.reset()
+    }
+
+    LaunchedEffect(updateStatus) {
+        if (updateStatus != Enums.ResponseStatus.Idle)
+            Toast.makeText(context, updateStatus.message, Toast.LENGTH_SHORT).show()
+        formViewModel.reset()
     }
 
     Scaffold(
@@ -249,19 +299,32 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, 
                                     weightUnit,
                                     activityLevel
                                 ).roundUpTwoDecimals()
+                                val amount = convertToML(
+                                    drinkAmount.toDouble(),
+                                    waterUnit
+                                ).roundUpTwoDecimals()
                                 val waterResult = WaterResult(
-                                    amount = convertToML(
-                                        drinkAmount.toDouble(),
-                                        waterUnit
-                                    ).roundUpTwoDecimals(),
-                                    resultValue = value,
                                     roomTemp = temp.toFloat(),
-                                    gender = gender,
+                                    tempUnit = tempUnit,
                                     weight = weight.toFloat(),
+                                    weightUnit = weightUnit,
                                     activityLevel = activityLevel,
-                                    percentage = 0f,
+                                    drinkAmount = amount,
+                                    waterUnit = waterUnit,
+                                    resultValue = value,
+                                    percentage = amount / value * 100,
+                                    gender = gender,
                                 )
-                                formViewModel.insert(waterResult = waterResult, context = context)
+                                if (isUpdate)
+                                    formViewModel.updateData(
+                                        waterResult = waterResult,
+                                        context = context
+                                    )
+                                else
+                                    formViewModel.insert(
+                                        waterResult = waterResult,
+                                        context = context
+                                    )
                                 navController.navigate(
                                     Screen.Visual.withValue(
                                         waterResult = waterResult
@@ -277,7 +340,9 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, 
                             interactionSource = interactionSource,
                         ) {
                             Text(
-                                text = stringResource(R.string.calculate),
+                                text = if (isUpdate) stringResource(R.string.update_and_calculate) else stringResource(
+                                    R.string.calculate
+                                ),
                                 fontSize = 16.sp,
                                 color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
                                 modifier = Modifier.padding(vertical = 4.dp),
@@ -316,32 +381,54 @@ fun FormScreen(modifier: Modifier = Modifier, navController: NavHostController, 
                             onOptionSelected = { unit -> if (unit != null) waterUnit = unit }
                         )
                     }
-                    Button(
-                        enabled = isEnabled,
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = {
-                            if (drinkAmount.toDoubleOrNull() != null)
-                                isNext = true
-                            else Toast.makeText(
-                                context,
-                                context.getString(R.string.please_make_sure_you_have_entered_the_correct_number_format),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        },
-                        shape = RoundedCornerShape(8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = if (isPressed) Color.White else BackgroundDark,
-                            disabledContainerColor = IconBackgroundGray
-                        ),
-                        border = BorderStroke(1.dp, if (isEnabled) BackgroundDark else Gray),
-                        interactionSource = interactionSource,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.next),
-                            fontSize = 16.sp,
-                            color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                    Column {
+                        Button(
+                            enabled = isEnabled,
+                            modifier = Modifier.fillMaxWidth(),
+                            onClick = {
+                                if (drinkAmount.toDoubleOrNull() != null)
+                                    isNext = true
+                                else Toast.makeText(
+                                    context,
+                                    context.getString(R.string.please_make_sure_you_have_entered_the_correct_number_format),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = if (isPressed) Color.White else BackgroundDark,
+                                disabledContainerColor = IconBackgroundGray
+                            ),
+                            border = BorderStroke(1.dp, if (isEnabled) BackgroundDark else Gray),
+                            interactionSource = interactionSource,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.next),
+                                fontSize = 16.sp,
+                                color = if (isEnabled) if (isPressed) BackgroundDark else Color.White else BackgroundDark,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                        if (isResultDataExist && !isUpdate)
+                            Button(
+                                modifier = Modifier.fillMaxWidth(),
+                                onClick = {
+                                    navController.navigate(Screen.List.route)
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    containerColor = Color.White,
+                                    disabledContainerColor = IconBackgroundGray
+                                ),
+                                border = BorderStroke(1.dp, BackgroundDark),
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.go_to_history),
+                                    fontSize = 16.sp,
+                                    color = BackgroundDark,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
                     }
                 }
         }

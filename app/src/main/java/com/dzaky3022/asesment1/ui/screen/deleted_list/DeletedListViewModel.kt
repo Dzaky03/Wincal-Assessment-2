@@ -1,12 +1,12 @@
 package com.dzaky3022.asesment1.ui.screen.deleted_list
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.database.UserDao
 import com.dzaky3022.asesment1.database.WaterResultDao
-import com.dzaky3022.asesment1.ui.model.DeletedResult
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.model.WaterResult
 import com.dzaky3022.asesment1.utils.DataStore
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class DeletedListViewModel(
-    private val localUser: User? = null,
+    private val localUser: StateFlow<User?>,
     private val userDao: UserDao,
     private val waterResultDao: WaterResultDao,
     private val dataStore: DataStore,
@@ -36,53 +36,91 @@ class DeletedListViewModel(
     private val _logOutStatus = MutableStateFlow(Enums.ResponseStatus.Idle)
     val logOutStatus: StateFlow<Enums.ResponseStatus> = _logOutStatus
 
-    private val _updateStatus = MutableStateFlow(Enums.ResponseStatus.Idle)
-    val updateStatus: StateFlow<Enums.ResponseStatus> = _updateStatus
+    private val _deleteAccountStatus = MutableStateFlow(Enums.ResponseStatus.Idle)
+    val deleteAccountStatus: StateFlow<Enums.ResponseStatus> = _deleteAccountStatus
+
+    private val _restoreStatus = MutableStateFlow(Enums.ResponseStatus.Idle)
+    val restoreStatus: StateFlow<Enums.ResponseStatus> = _restoreStatus
+
+    private val _deleteStatus = MutableStateFlow(Enums.ResponseStatus.Idle)
+    val deleteStatus: StateFlow<Enums.ResponseStatus> = _deleteStatus
+
+    private val _orientationView = MutableStateFlow(Enums.OrientationView.List)
+    val orientationView: StateFlow<Enums.OrientationView> = _orientationView
 
     init {
+        viewModelScope.launch {
+            localUser.collect {
+                _userData.value = it
+            }
+        }
+        getOrientationView()
         getList()
     }
 
     fun getList() {
-        _loadStatus.value = Enums.ResponseStatus.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = userDao.getUserWithResults(localUser?.id ?: "")
-            _listData.value = response.results
-            _userData.value = response.user
-            _loadStatus.value = Enums.ResponseStatus.Idle
+        _userData.value.let {
+            _loadStatus.value = Enums.ResponseStatus.Loading.apply { updateMessage("") }
+            viewModelScope.launch(Dispatchers.IO) {
+                val response =
+                    waterResultDao.getDataByUser(
+                        _userData.value?.id ?: "",
+                        status = Enums.DataStatus.Deleted
+                    )
+                _listData.value = response
+                _loadStatus.value = Enums.ResponseStatus.Idle
+                Log.d("ListVM", "list: $response")
+            }
         }
     }
 
-    fun deleteDataPermanent(waterResultId: String) {
+    fun deleteDataPermanent(waterResultId: String, context: Context) {
+        _deleteStatus.value =
+            Enums.ResponseStatus.Loading.apply { updateMessage(context.getString(R.string.waiting)) }
         viewModelScope.launch(Dispatchers.IO) {
-            waterResultDao.deletePermanent(waterResultId)
-        }
-        getList()
-    }
-
-    fun updateData(waterResult: WaterResult, context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val response = waterResultDao.update(waterResult)
+            val response = waterResultDao.deletePermanent(waterResultId)
             if (response > 0)
-                _updateStatus.value = Enums.ResponseStatus.Success.apply {
+                _deleteStatus.value = Enums.ResponseStatus.Success.apply {
+                    updateMessage(
+                        context.getString(R.string.delete_data_success),
+                    )
+                }
+            else
+                _deleteStatus.value = Enums.ResponseStatus.Failed.apply {
+                    updateMessage(
+                        context.getString(R.string.delete_data_failed),
+                    )
+                }
+            getList()
+        }
+    }
+
+    fun restoreData(waterResultId: String, context: Context) {
+        _restoreStatus.value =
+            Enums.ResponseStatus.Loading.apply { updateMessage(context.getString(R.string.waiting)) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = waterResultDao.restoreById(waterResultId)
+            if (response > 0)
+                _restoreStatus.value = Enums.ResponseStatus.Success.apply {
                     updateMessage(
                         context.getString(
-                            R.string.update_data_success
+                            R.string.restore_data_success
                         )
                     )
                 }
             else
-                _updateStatus.value = Enums.ResponseStatus.Failed.apply {
+                _restoreStatus.value = Enums.ResponseStatus.Failed.apply {
                     updateMessage(
-                        context.getString(R.string.update_data_failed)
+                        context.getString(R.string.restore_data_failed),
                     )
                 }
+            getList()
         }
-        getList()
     }
 
     fun logout(context: Context) {
-        _logOutStatus.value = Enums.ResponseStatus.Loading
+        _logOutStatus.value =
+            Enums.ResponseStatus.Loading.apply { updateMessage(context.getString(R.string.waiting)) }
         viewModelScope.launch(Dispatchers.IO) {
             dataStore.clearEmail()
             if (dataStore.emailFlow.firstOrNull().isNullOrEmpty())
@@ -101,7 +139,60 @@ class DeletedListViewModel(
                         )
                     )
                 }
+        }
+    }
+
+    fun deleteAccount(context: Context) {
+        _deleteAccountStatus.value =
+            Enums.ResponseStatus.Loading.apply { updateMessage(context.getString(R.string.waiting)) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val response = userDao.deleteUserById(_userData.value?.id ?: "")
+            dataStore.clearEmail()
+            if (response > 0 && dataStore.emailFlow.firstOrNull().isNullOrEmpty())
+                _deleteAccountStatus.value = Enums.ResponseStatus.Success.apply {
+                    updateMessage(
+                        context.getString(R.string.delete_account_success),
+                    )
+                }
+            else
+                _deleteAccountStatus.value = Enums.ResponseStatus.Failed.apply {
+                    updateMessage(
+                        context.getString(R.string.delete_account_failed),
+                    )
+                }
 
         }
+    }
+
+    private fun getOrientationView() {
+        viewModelScope.launch {
+            dataStore.layoutFlow.collect {
+                _orientationView.value =
+                    if (it) Enums.OrientationView.List else Enums.OrientationView.Grid
+            }
+        }
+    }
+
+    fun changeOrientationView(orientationView: Enums.OrientationView) {
+        viewModelScope.launch {
+            dataStore.saveLayout(orientationView)
+            getOrientationView()
+        }
+    }
+
+    fun reset() {
+        _logOutStatus.value = Enums.ResponseStatus.Idle
+        _restoreStatus.value= Enums.ResponseStatus.Idle
+        _deleteStatus.value = Enums.ResponseStatus.Idle
+        _deleteAccountStatus.value = Enums.ResponseStatus.Idle
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        _logOutStatus.value = Enums.ResponseStatus.Idle
+        _restoreStatus.value= Enums.ResponseStatus.Idle
+        _deleteStatus.value = Enums.ResponseStatus.Idle
+        _deleteAccountStatus.value = Enums.ResponseStatus.Idle
+        _loadStatus.value = Enums.ResponseStatus.Idle
     }
 }

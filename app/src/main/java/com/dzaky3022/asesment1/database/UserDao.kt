@@ -4,23 +4,21 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import com.dzaky3022.asesment1.ui.model.User
-import com.dzaky3022.asesment1.ui.model.UserWithResults
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUser(user: User)
+    suspend fun insertUser(user: User): Long?
 
     @Query("DELETE FROM users WHERE id = :id")
-    suspend fun deleteUserById(id: String)
+    suspend fun deleteUserById(id: String): Int
 
-    @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
+    @Query("SELECT * FROM users WHERE email = :email")
     suspend fun getUserByEmail(email: String): User?
 
-    @Transaction
-    @Query("SELECT * FROM users WHERE id = :id")
-    suspend fun getUserWithResults(id: String): UserWithResults
+    @Query("SELECT * FROM users WHERE email = :email")
+    fun getAndListenUserByEmail(email: String): Flow<User?>
 }

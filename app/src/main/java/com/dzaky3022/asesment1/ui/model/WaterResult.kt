@@ -4,7 +4,12 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.dzaky3022.asesment1.utils.Enums.*
+import com.dzaky3022.asesment1.utils.Enums.ActivityLevel
+import com.dzaky3022.asesment1.utils.Enums.DataStatus
+import com.dzaky3022.asesment1.utils.Enums.Gender
+import com.dzaky3022.asesment1.utils.Enums.TempUnit
+import com.dzaky3022.asesment1.utils.Enums.WaterUnit
+import com.dzaky3022.asesment1.utils.Enums.WeightUnit
 import org.threeten.bp.Instant
 import java.util.UUID
 
@@ -21,14 +26,17 @@ import java.util.UUID
 data class WaterResult (
     @PrimaryKey var id: String = UUID.randomUUID().toString().take(8),
     var uid: String? = null,
-    val roomTemp: Float,
-    val weight: Float,
-    val activityLevel: ActivityLevel,
-    val amount: Float,
-    val resultValue: Float,
-    val percentage: Float,
-    val gender: Gender,
-    val dataStatus: DataStatus = DataStatus.Available,
-    val createdAt: Instant? = null,
-    val updatedAt: Instant? = null,
+    var roomTemp: Float,
+    var tempUnit: TempUnit? = null,
+    var weight: Float,
+    var weightUnit: WeightUnit? = null,
+    var activityLevel: ActivityLevel,
+    var drinkAmount: Float,
+    var waterUnit: WaterUnit? = null,
+    var resultValue: Float,
+    var percentage: Float,
+    var gender: Gender,
+    var dataStatus: DataStatus = DataStatus.Available,
+    var createdAt: Instant? = null,
+    var updatedAt: Instant? = null,
 )

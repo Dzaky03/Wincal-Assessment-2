@@ -325,7 +325,7 @@ fun WavesDrawing(
                                         text = buildAnnotatedString {
                                             append(stringResource(R.string.you_ve_consumed))
                                             withStyle(style = SpanStyle(color = Water)) {
-                                                append("${waterResult?.amount} ml")
+                                                append("${waterResult?.drinkAmount} ml")
                                             }
                                             append(stringResource(R.string.of_water))
                                         },
@@ -500,7 +500,7 @@ fun WavesDrawing(
                                 color = WhiteTitle,
                             )
                             Text(
-                                text = "${waterResult?.amount} ml",
+                                text = "${waterResult?.drinkAmount} ml",
                                 color = WhiteTitle,
                             )
                         }

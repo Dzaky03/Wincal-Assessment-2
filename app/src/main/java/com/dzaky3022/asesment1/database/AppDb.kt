@@ -9,7 +9,7 @@ import com.dzaky3022.asesment1.ui.model.DeletedResult
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.model.WaterResult
 
-@Database(entities = [User::class, WaterResult::class, DeletedResult::class], version = 1)
+@Database(entities = [User::class, WaterResult::class, DeletedResult::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao

@@ -22,9 +22,9 @@ class DataStore(private val context: Context) {
         preferences[IS_LIST] ?: true
     }
 
-    suspend fun saveLayout(isList: Boolean) {
+    suspend fun saveLayout(orientationView: Enums.OrientationView) {
         context.dataStore.edit { preferences ->
-            preferences[IS_LIST] = isList
+            preferences[IS_LIST] = orientationView == Enums.OrientationView.List
         }
     }
 

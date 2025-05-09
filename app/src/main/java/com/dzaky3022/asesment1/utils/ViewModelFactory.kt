@@ -7,11 +7,13 @@ import com.dzaky3022.asesment1.database.WaterResultDao
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.screen.dashboard.DashboardViewModel
 import com.dzaky3022.asesment1.ui.screen.deleted_list.DeletedListViewModel
-import com.dzaky3022.asesment1.ui.screen.deleted_list.ListViewModel
+import com.dzaky3022.asesment1.ui.screen.form.FormViewModel
+import com.dzaky3022.asesment1.ui.screen.list.ListViewModel
+import kotlinx.coroutines.flow.StateFlow
 
 class ViewModelFactory(
     private val waterResultId: String? = null,
-    private val localUser: User? = null,
+    private val localUser: StateFlow<User?>? = null,
     private val dataStore: DataStore? = null,
     private val userDao: UserDao? = null,
     private val waterResultDao: WaterResultDao? = null,
@@ -33,6 +35,12 @@ class ViewModelFactory(
                 userDao!!,
                 waterResultDao!!,
                 dataStore!!,
+            ) as T
+        } else if (modelClass.isAssignableFrom(FormViewModel::class.java)) {
+            return FormViewModel(
+                localUser!!,
+                waterResultId,
+                waterResultDao!!,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

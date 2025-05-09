@@ -15,10 +15,9 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.rememberTextMeasurer
-import com.dzaky3022.asesment1.utils.toPx
 import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
 import com.dzaky3022.asesment1.utils.roundUpTwoDecimals
-import java.math.RoundingMode
+import com.dzaky3022.asesment1.utils.toPx
 
 @Composable
 fun createTextParamsAsState(

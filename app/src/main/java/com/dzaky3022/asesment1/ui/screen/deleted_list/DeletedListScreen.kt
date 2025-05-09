@@ -1,33 +1,24 @@
 package com.dzaky3022.asesment1.ui.screen.deleted_list
 
 import android.widget.Toast
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.PersonOutline
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardDefaults.cardColors
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,19 +41,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
-import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.EmptyState
 import com.dzaky3022.asesment1.ui.component.ProfilDialog
 import com.dzaky3022.asesment1.ui.component.PullToRefreshContainer
-import com.dzaky3022.asesment1.ui.model.WaterResult
+import com.dzaky3022.asesment1.ui.component.WarningDialog
+import com.dzaky3022.asesment1.ui.component.WaterResultItem
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
-import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.utils.Enums
-import com.dzaky3022.asesment1.utils.toFormattedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,30 +63,104 @@ fun DeletedListScreen(
     val listData by deletedListViewModel.listData.collectAsState()
     val loadStatus by deletedListViewModel.loadStatus.collectAsState()
     val userData by deletedListViewModel.userData.collectAsState()
-    val updateStatus by deletedListViewModel.updateStatus.collectAsState()
+    val restoreStatus by deletedListViewModel.restoreStatus.collectAsState()
+    val deleteStatus by deletedListViewModel.deleteStatus.collectAsState()
+    val deleteAccountStatus by deletedListViewModel.deleteAccountStatus.collectAsState()
+    val orientationView by deletedListViewModel.orientationView.collectAsState()
     var showProfileDialog by rememberSaveable { mutableStateOf(false) }
-    var showUpdateDialog by rememberSaveable { mutableStateOf(false) }
-    var orientationView by rememberSaveable { mutableStateOf(Enums.OrientationView.List) }
+    var showDeleteDialog by rememberSaveable { mutableStateOf(false to "") }
+    var showRestoreDialog by rememberSaveable { mutableStateOf(false to "") }
+    var showDeleteAccountDialog by rememberSaveable { mutableStateOf(false) }
 
     if (showProfileDialog)
         userData?.let {
             ProfilDialog(
                 user = it,
-                onDismissRequest = { showProfileDialog = false }
+                onDismissRequest = { showProfileDialog = false },
+                onLogout =  {
+                    showProfileDialog = false
+                    deletedListViewModel.logout(context)
+                }
             ) {
                 showProfileDialog = false
-                deletedListViewModel.logout(context)
+                showDeleteAccountDialog = true
             }
+        }
+
+    if (showDeleteDialog.first)
+        WarningDialog(
+            label = stringResource(R.string.delete_this_data_permanently),
+            onDismissRequest = {
+                showDeleteDialog = false to showDeleteDialog.second
+            }) {
+            deletedListViewModel.deleteDataPermanent(showDeleteDialog.second, context)
+            showDeleteDialog = false to ""
+        }
+
+    if (showRestoreDialog.first)
+        WarningDialog(
+            isPositive = true,
+            label = stringResource(R.string.restore_this_data),
+            confirmationLabel = "Restore",
+            onDismissRequest = {
+                showRestoreDialog = false to showRestoreDialog.second
+            }) {
+            deletedListViewModel.restoreData(showRestoreDialog.second, context)
+            showRestoreDialog = false to ""
+        }
+
+    if (showDeleteAccountDialog)
+        WarningDialog(
+            label = stringResource(R.string.delete_your_account),
+            onDismissRequest = {
+                showDeleteAccountDialog = false
+            }) {
+            showDeleteAccountDialog = false
+            deletedListViewModel.deleteAccount(context)
         }
 
     LaunchedEffect(logoutStatus) {
         if (logoutStatus != Enums.ResponseStatus.Idle)
             Toast.makeText(context, logoutStatus.message, Toast.LENGTH_SHORT).show()
+
+        if (logoutStatus == Enums.ResponseStatus.Success) {
+            navController.popBackStack(
+                route = navController.graph.startDestinationRoute ?: "",
+                inclusive = false
+            )
+            deletedListViewModel.reset()
+        }
     }
 
-    LaunchedEffect(updateStatus) {
-        if (updateStatus != Enums.ResponseStatus.Idle)
-            Toast.makeText(context, updateStatus.message, Toast.LENGTH_SHORT).show()
+    LaunchedEffect(deleteAccountStatus) {
+        if (deleteAccountStatus != Enums.ResponseStatus.Idle)
+            Toast.makeText(context, deleteAccountStatus.message, Toast.LENGTH_SHORT).show()
+
+        if (deleteAccountStatus == Enums.ResponseStatus.Success) {
+            navController.popBackStack(
+                route = navController.graph.startDestinationRoute ?: "",
+                inclusive = false
+            )
+            deletedListViewModel.reset()
+        }
+    }
+
+    LaunchedEffect(restoreStatus) {
+        if (restoreStatus != Enums.ResponseStatus.Idle) {
+            Toast.makeText(context, restoreStatus.message, Toast.LENGTH_SHORT).show()
+            deletedListViewModel.reset()
+        }
+    }
+
+    LaunchedEffect(deleteStatus) {
+        if (deleteStatus != Enums.ResponseStatus.Idle) {
+            Toast.makeText(context, deleteStatus.message, Toast.LENGTH_SHORT).show()
+            deletedListViewModel.reset()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        deletedListViewModel.getList()
     }
 
     PullToRefreshContainer(
@@ -128,7 +190,7 @@ fun DeletedListScreen(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = stringResource(R.string.list_calculation_results),
+                                text = stringResource(R.string.deleted_list_results),
                                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                             )
                         }
@@ -140,7 +202,7 @@ fun DeletedListScreen(
                             Icon(
                                 imageVector = Icons.Default.PersonOutline,
                                 contentDescription = stringResource(R.string.profile_icon),
-                                tint = Color.White,
+                                tint = BackgroundDark,
                             )
                         }
                     },
@@ -157,20 +219,12 @@ fun DeletedListScreen(
                     Modifier
                         .fillMaxWidth()
                         .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.End,
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                navController.navigate(Screen.DeletedList.route)
-                            }
-                    ) {
-                        Text("View deleted data...", fontSize = 14.sp, color = Color.Gray)
-                    }
                     IconButton(onClick = {
-                        orientationView =
+                        deletedListViewModel.changeOrientationView(
                             if (orientationView == Enums.OrientationView.List) Enums.OrientationView.Grid else Enums.OrientationView.List
+                        )
                     }) {
                         Icon(
                             imageVector = if (orientationView == Enums.OrientationView.List) Icons.Default.GridView else Icons.AutoMirrored.Filled.List,
@@ -178,7 +232,7 @@ fun DeletedListScreen(
                         )
                     }
                 }
-                if (listData.isNullOrEmpty()) {
+                if (listData.isNullOrEmpty() || loadStatus == Enums.ResponseStatus.Loading) {
                     EmptyState(
                         isLoading = loadStatus == Enums.ResponseStatus.Loading
                     )
@@ -190,9 +244,15 @@ fun DeletedListScreen(
                                 contentPadding = PaddingValues(8.dp),
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(listData!!) { item ->
-                                    WaterResultItem(item) { id ->
-                                        deletedListViewModel.deleteDataPermanent(id)
+                                itemsIndexed(listData!!) { index, item ->
+                                    WaterResultItem(
+                                        isRestore = true,
+                                        label = "Data ${index + 1}",
+                                        item = item,
+                                        onEditOrRestore = { id ->
+                                            showRestoreDialog = true to id
+                                        }) { id ->
+                                        showDeleteDialog = true to id
                                     }
                                 }
                             }
@@ -206,60 +266,21 @@ fun DeletedListScreen(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(listData!!) { item ->
-                                    WaterResultItem(item) { id ->
-                                        deletedListViewModel.deleteDataPermanent(id)
+                                itemsIndexed(listData!!) { index, item ->
+                                    WaterResultItem(
+                                        isRestore = true,
+                                        label = "Data ${index + 1}",
+                                        item = item,
+                                        onEditOrRestore = { id ->
+                                            showRestoreDialog = true to id
+                                        }) { id ->
+                                        showDeleteDialog = true to id
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WaterResultItem(item: WaterResult, onDelete: (String) -> Unit) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = cardColors(containerColor = BackgroundLight)
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .align(Alignment.Center)
-            ) {
-                Text("Room Temp: ${item.roomTemp}°C")
-                Text("Weight: ${item.weight} kg")
-                Text("Activity Level: ${item.activityLevel}")
-                Text("Amount: ${item.amount} ml")
-                Text("Result Value: ${item.resultValue}")
-                Text("Percentage: ${item.percentage}%")
-                Text("Gender: ${item.gender}")
-                item.createdAt?.let {
-                    Text("Created At: ${it.toFormattedDate(java.util.Locale.getDefault())}")
-                }
-            }
-            IconButton(
-                onClick = {
-                    onDelete(item.id)
-                },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error
-                )
             }
         }
     }
