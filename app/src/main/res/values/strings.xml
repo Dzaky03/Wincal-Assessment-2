@@ -81,4 +81,5 @@
     <string name="delete_your_account">Delete your account?</string>
     <string name="insert_data_success">Insert Data: Success</string>
     <string name="register_success">Register: Success</string>
+    <string name="add_data_button">Add Data Button</string>
 </resources>

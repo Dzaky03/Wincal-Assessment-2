@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -52,6 +54,7 @@ import com.dzaky3022.asesment1.ui.component.PullToRefreshContainer
 import com.dzaky3022.asesment1.ui.component.WarningDialog
 import com.dzaky3022.asesment1.ui.component.WaterResultItem
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.utils.Enums
 
@@ -75,12 +78,12 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
             ProfilDialog(
                 user = it,
                 onDismissRequest = { showProfileDialog = false },
-                onLogout =  {
+                onLogout = {
                     showProfileDialog = false
                     listViewModel.logout(context)
                 }
             ) {
-                    showProfileDialog = false
+                showProfileDialog = false
                 showDeleteAccountDialog = true
             }
         }
@@ -186,7 +189,18 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Water),
                 )
-            }
+            },
+            floatingActionButton = {
+                FloatingActionButton(containerColor = BackgroundLight, onClick = {
+                    navController.navigate(Screen.Form.route)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Add,
+                        contentDescription = stringResource(R.string.add_data_button),
+                        tint = BackgroundDark
+                    )
+                }
+            },
         ) {
             Column(
                 modifier = Modifier
