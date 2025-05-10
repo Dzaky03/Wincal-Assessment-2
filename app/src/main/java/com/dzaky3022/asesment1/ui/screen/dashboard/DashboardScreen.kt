@@ -47,7 +47,6 @@ import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.CustomInput
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
-import com.dzaky3022.asesment1.ui.theme.Danger
 import com.dzaky3022.asesment1.ui.theme.Gray
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.ui.theme.WhiteCaption

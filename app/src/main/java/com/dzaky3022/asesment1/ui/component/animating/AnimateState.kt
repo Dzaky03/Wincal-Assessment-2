@@ -42,7 +42,7 @@ fun waveProgressAsState(
                 )
             }
 
-            else -> animatable
+            else -> return@LaunchedEffect
         }
     }
 

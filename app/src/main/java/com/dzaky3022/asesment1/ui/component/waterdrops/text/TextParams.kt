@@ -1,10 +1,7 @@
-@file:OptIn(ExperimentalTextApi::class)
-
 package com.dzaky3022.asesment1.ui.component.waterdrops.text
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 

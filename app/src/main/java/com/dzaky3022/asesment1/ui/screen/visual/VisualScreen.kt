@@ -288,7 +288,7 @@ fun WavesDrawing(
                             isSimpleView = true
                             shareTriggered = true
                         },
-                    );
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Water),
             )

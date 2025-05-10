@@ -2,7 +2,7 @@
     <string name="app_name">WinCal</string>
     <string name="button_start">Start</string>
     <string name="share_template">Room Temperature: %1$.2f Weight: %2$.2f Activity Level: %3$s Water Intake Needed Today: %4$.2f ml Drink Taken vs Needed: %5$.2f%% Gender: %6$s</string>
-    <string name="tap_to_go_back">Tap to go back...</string>
+    <string name="tap_to_go_back">Tap to go back…</string>
     <string name="share_title">Share result to your friend by using menu button on top right corner!</string>
     <string name="goal_achieved">Goal Achieved! 🥳🎉</string>
     <string name="almost">Almost there! Just a bit more 💧</string>
@@ -16,7 +16,7 @@
     <string name="weight">"Weight"</string>
     <string name="room_temp">"Room Temperature"</string>
     <string name="email">"Email"</string>
-    <string name="tap_to_continue">Tap to continue...</string>
+    <string name="tap_to_continue">Tap to continue…</string>
     <string name="the_amount_you_need_today_is">"The amount you need today is&#160;"</string>
     <string name="you_ve_consumed">"You've consumed&#160;"</string>
     <string name="of_water">"&#160;of water"</string>
@@ -40,7 +40,7 @@
     <string name="high">High</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
-    <string name="that_s_about">That\'s about...</string>
+    <string name="that_s_about">That\'s about…</string>
     <string name="out_of_your_recommended_amount">Out of the recommended amount.</string>
     <string name="simple_view">Simple View</string>
     <string name="visualized_view">Visualized View</string>
@@ -58,8 +58,8 @@
     <string name="waiting">Waiting..</string>
     <string name="delete_data_success">Delete Data: Success</string>
     <string name="delete_data_failed">Delete Data: Failed</string>
-    <string name="loading">Loading...</string>
-    <string name="initializing">Initializing...</string>
+    <string name="loading">Loading…</string>
+    <string name="initializing">Initializing…</string>
     <string name="deleted_list_results">Deleted List Results</string>
     <string name="go_to_history">Go to History</string>
     <string name="close">Close</string>

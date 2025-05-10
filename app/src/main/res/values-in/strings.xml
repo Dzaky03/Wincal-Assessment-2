@@ -82,4 +82,5 @@
     <string name="delete_account_success">Hapus Akun: Sukses</string>
     <string name="delete_account_failed">Hapus Akun: Gagal</string>
     <string name="delete_account">Hapus akun</string>
+    <string name="add_data_button">Tambahkan tombol Data</string>
 </resources>

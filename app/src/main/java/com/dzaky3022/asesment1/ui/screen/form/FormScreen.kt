@@ -104,7 +104,7 @@ fun FormScreen(
     var gender by rememberSaveable { mutableStateOf(Gender.Male) }
     var isEnabled by rememberSaveable { mutableStateOf(false) }
     var drinkAmount by rememberSaveable { mutableStateOf("") }
-    var waterUnit by rememberSaveable { mutableStateOf(WaterUnit.ml) }
+    var waterUnit by rememberSaveable { mutableStateOf(WaterUnit.Ml) }
     var isNext by rememberSaveable { mutableStateOf(false) }
 
     val insertStatus by formViewModel.insertStatus.collectAsState()
@@ -119,7 +119,7 @@ fun FormScreen(
                 tempUnit != (data?.tempUnit ?: TempUnit.Celsius) ||
                 activityLevel != (data?.activityLevel ?: ActivityLevel.Low) ||
                 gender != (data?.gender ?: Gender.Male) ||
-                waterUnit != (data?.waterUnit ?: WaterUnit.ml) ||
+                waterUnit != (data?.waterUnit ?: WaterUnit.Ml) ||
                 drinkAmount != data?.drinkAmount.toString()
     }
 
@@ -135,7 +135,7 @@ fun FormScreen(
             tempUnit = data?.tempUnit ?: TempUnit.Celsius
             activityLevel = data?.activityLevel ?: ActivityLevel.Low
             gender = data?.gender ?: Gender.Male
-            waterUnit = data?.waterUnit ?: WaterUnit.ml
+            waterUnit = data?.waterUnit ?: WaterUnit.Ml
             drinkAmount = data?.drinkAmount.toString()
         }
     }
@@ -566,8 +566,8 @@ private fun calculateGender(gender: Gender): Double {
 
 fun convertToML(amount: Double, unit: WaterUnit): Double {
     return when (unit) {
-        WaterUnit.oz -> amount * 29.5735
-        WaterUnit.glasses -> amount * 250
-        WaterUnit.ml -> amount
+        WaterUnit.Oz -> amount * 29.5735
+        WaterUnit.Glasses -> amount * 250
+        WaterUnit.Ml -> amount
     }
 }

@@ -11,30 +11,30 @@ import kotlinx.coroutines.flow.map
 val Context.dataStore by preferencesDataStore(name = "data_prefs")
 
 class DataStore(private val context: Context) {
-    private val EMAIL_KEY = stringPreferencesKey("email_key")
-    private val IS_LIST = booleanPreferencesKey("is_list")
+    private val emailKey = stringPreferencesKey("email_key")
+    private val isList = booleanPreferencesKey("is_list")
 
     val emailFlow: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[EMAIL_KEY] ?: ""
+        preferences[emailKey] ?: ""
     }
 
     val layoutFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
-        preferences[IS_LIST] ?: true
+        preferences[isList] ?: true
     }
 
     suspend fun saveLayout(orientationView: Enums.OrientationView) {
         context.dataStore.edit { preferences ->
-            preferences[IS_LIST] = orientationView == Enums.OrientationView.List
+            preferences[isList] = orientationView == Enums.OrientationView.List
         }
     }
 
     suspend fun saveEmail(email: String) {
         context.dataStore.edit { preferences ->
-            preferences[EMAIL_KEY] = email
+            preferences[emailKey] = email
         }
     }
 
     suspend fun clearEmail() {
-        context.dataStore.edit { it.remove(EMAIL_KEY) }
+        context.dataStore.edit { it.remove(emailKey) }
     }
 }

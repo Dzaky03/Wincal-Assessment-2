@@ -1,11 +1,9 @@
 package com.dzaky3022.asesment1.ui.model
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import androidx.room.Relation
 import java.util.UUID
 
 @Entity(
@@ -34,14 +32,4 @@ data class DeletedResult(
     @PrimaryKey var id: String = UUID.randomUUID().toString().take(8),
     var uid: String? = null,
     var waterResultId: String? = null,
-)
-
-data class DeletedResultWithWaterResult(
-    @Embedded val deletedResult: DeletedResult,
-
-    @Relation(
-        parentColumn = "waterResultId",
-        entityColumn = "id"
-    )
-    val waterResult: WaterResult?
 )

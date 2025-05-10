@@ -47,7 +47,7 @@ import androidx.navigation.NavHostController
 import com.dzaky3022.asesment1.R
 import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.EmptyState
-import com.dzaky3022.asesment1.ui.component.ProfilDialog
+import com.dzaky3022.asesment1.ui.component.ProfileDialog
 import com.dzaky3022.asesment1.ui.component.PullToRefreshContainer
 import com.dzaky3022.asesment1.ui.component.WarningDialog
 import com.dzaky3022.asesment1.ui.component.WaterResultItem
@@ -78,7 +78,7 @@ fun DeletedListScreen(
 
     if (showProfileDialog)
         userData?.let {
-            ProfilDialog(
+            ProfileDialog(
                 user = it,
                 onDismissRequest = { showProfileDialog = false },
                 onLogout =  {

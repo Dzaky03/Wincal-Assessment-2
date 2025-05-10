@@ -37,7 +37,7 @@ import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Danger
 
 @Composable
-fun ProfilDialog(
+fun ProfileDialog(
     user: User,
     onDismissRequest: () -> Unit,
     onLogout: () -> Unit,

@@ -31,12 +31,11 @@ class Enums {
     }
     enum class Direction {
         Horizontal,
-        Vertical,
     }
     enum class WaterUnit {
-        ml,
-        oz,
-        glasses,
+        Ml,
+        Oz,
+        Glasses,
     }
     enum class ScreenState {
         FirstScreen,

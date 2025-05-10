@@ -8,8 +8,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.core.content.FileProvider
-import androidx.navigation.NavHostController
-import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.screen.visual.ElementParams
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
@@ -85,22 +83,6 @@ fun Int.toBoolean(): Boolean = this != 0
 
 @Stable
 fun TextUnit.toPx(density: Density): Float = with(density) { this@toPx.roundToPx().toFloat() }
-
-fun navigate(
-    navController: NavHostController,
-    route: String,
-    saveState: Boolean = true,
-    restoreState: Boolean = true,
-    launchSingleTop: Boolean = true
-) {
-    navController.navigate(route) {
-        popUpTo(Screen.Dashboard.route) {
-            this.saveState = saveState
-        }
-        this.launchSingleTop = launchSingleTop
-        this.restoreState = restoreState
-    }
-}
 
 fun shareData(context: Context, bitmap: Bitmap, caption: String) {
     val file = File(context.cacheDir, "screenshot.png")
