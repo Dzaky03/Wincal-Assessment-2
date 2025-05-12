@@ -38,11 +38,12 @@ import androidx.compose.ui.unit.sp
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
 import com.dzaky3022.asesment1.ui.theme.Danger
 import com.dzaky3022.asesment1.ui.theme.Gray
+import com.dzaky3022.asesment1.ui.theme.WhiteTitle
 
 @Composable
 fun <T> CustomInput(
     label: String = "",
-    labelColor: Color = Color.Black,
+    labelColor: Color? = null,
     textColor: Color = Color.Black,
     hint: String,
     helperText: String? = null,
@@ -50,6 +51,7 @@ fun <T> CustomInput(
     initialValue: String = "",
     isEnabled: Boolean = true,
     isEmail: Boolean = false,
+    isDarkMode: Boolean = false,
     isDigitOnly: Boolean = false,
     isRequired: Boolean = false,
     maxLength: Int? = null,
@@ -74,7 +76,7 @@ fun <T> CustomInput(
                 Text(
                     text = label,
                     fontSize = 14.sp,
-                    color = labelColor,
+                    color = labelColor ?: if (isDarkMode) WhiteTitle else Color.Black,
                     modifier = Modifier.padding(bottom = 4.dp),
                     fontWeight = FontWeight.SemiBold,
                 )

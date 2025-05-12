@@ -192,7 +192,7 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
             },
             floatingActionButton = {
                 FloatingActionButton(containerColor = BackgroundLight, onClick = {
-                    navController.navigate(Screen.Form.route)
+                    navController.navigate(Screen.Form.withParams(useFab = true))
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Add,
@@ -250,7 +250,7 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                                         label = "Data ${index + 1}",
                                         item = item,
                                         onEditOrRestore = { id ->
-                                            navController.navigate(Screen.UpdateForm.withId(id))
+                                            navController.navigate(Screen.Form.withParams(id))
                                         }
                                     ) { id ->
                                         showDeleteDialog = true to id
@@ -272,7 +272,7 @@ fun ListScreen(navController: NavHostController, listViewModel: ListViewModel) {
                                         label = "Data ${index + 1}",
                                         item = item,
                                         onEditOrRestore = { id ->
-                                            navController.navigate(Screen.UpdateForm.withId(id))
+                                            navController.navigate(Screen.Form.withParams(id))
                                         }) { id ->
                                         showDeleteDialog = true to id
                                     }

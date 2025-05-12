@@ -71,27 +71,13 @@ fun NavGraph(
             )
         }
         composable(Screen.Form.route,
-            enterTransition = {
-                scaleIn(initialScale = 0.8f) + fadeIn()
-            },
-            exitTransition = {
-                scaleOut(targetScale = 1.2f) + fadeOut()
-            }
-        ) {
-            FormScreen(
-                navController = navController,
-                formViewModel = viewModel(
-                    factory = ViewModelFactory(
-                        localUser = localUser,
-                        waterResultDao = waterResultDao,
-                    )
-                ),
-            )
-        }
-        composable(Screen.UpdateForm.route,
             arguments = listOf(
                 navArgument(KEY_DATA_ID) {
                     type = NavType.StringType
+                    nullable = true
+                },
+                navArgument(KEY_USE_FAB) {
+                    type = NavType.BoolType
                 },
             ),
             enterTransition = {
@@ -102,6 +88,7 @@ fun NavGraph(
             }
         ) {
             val dataId = it.arguments?.getString(KEY_DATA_ID) ?: ""
+            val useFab = it.arguments?.getBoolean(KEY_USE_FAB) ?: false
 
             FormScreen(
                 navController = navController,
@@ -110,6 +97,7 @@ fun NavGraph(
                         localUser = localUser,
                         waterResultId = dataId,
                         waterResultDao = waterResultDao,
+                        useFab = useFab,
                     )
                 ),
             )

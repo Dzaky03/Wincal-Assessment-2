@@ -95,6 +95,7 @@ fun FormScreen(
     val isUpdate by formViewModel.isUpdate.collectAsState()
     val updateStatus by formViewModel.updateStatus.collectAsState()
     val isResultDataExist by formViewModel.isDataExist.collectAsState()
+    val useFAB by formViewModel.useFAB.collectAsState()
 
     var weight by rememberSaveable { mutableStateOf("") }
     var weightUnit by rememberSaveable { mutableStateOf(WeightUnit.Kilogram) }
@@ -409,7 +410,7 @@ fun FormScreen(
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
-                        if (isResultDataExist && !isUpdate)
+                        if (isResultDataExist && !isUpdate && !useFAB)
                             Button(
                                 modifier = Modifier.fillMaxWidth(),
                                 onClick = {

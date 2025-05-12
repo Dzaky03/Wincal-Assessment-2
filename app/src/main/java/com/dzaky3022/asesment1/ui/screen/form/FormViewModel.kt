@@ -19,6 +19,7 @@ class FormViewModel(
     private val localUser: StateFlow<User?>,
     private val waterResultId: String? = null,
     private val waterResultDao: WaterResultDao,
+    private val useFab: Boolean? = false,
 ) : ViewModel() {
 
     private val _isUpdate = MutableStateFlow(false)
@@ -39,6 +40,9 @@ class FormViewModel(
     private val _isDataExist = MutableStateFlow(false)
     val isDataExist: StateFlow<Boolean> = _isDataExist
 
+    private val _useFAB = MutableStateFlow(false)
+    val useFAB: StateFlow<Boolean> = _useFAB
+
     init {
         viewModelScope.launch {
             localUser.collect {
@@ -50,6 +54,7 @@ class FormViewModel(
             getData()
             _isUpdate.value = true
         }
+        _useFAB.value = useFab!!
     }
 
     fun insert(waterResult: WaterResult, context: Context) {

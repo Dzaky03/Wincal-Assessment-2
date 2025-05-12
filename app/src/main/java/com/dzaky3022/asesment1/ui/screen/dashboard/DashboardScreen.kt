@@ -47,7 +47,7 @@ import com.dzaky3022.asesment1.navigation.Screen
 import com.dzaky3022.asesment1.ui.component.CustomInput
 import com.dzaky3022.asesment1.ui.model.User
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
-import com.dzaky3022.asesment1.ui.theme.Gray
+import com.dzaky3022.asesment1.ui.theme.IconBackgroundGray
 import com.dzaky3022.asesment1.ui.theme.Water
 import com.dzaky3022.asesment1.ui.theme.WhiteCaption
 import com.dzaky3022.asesment1.ui.theme.WhiteTitle
@@ -66,11 +66,22 @@ fun DashboardScreen(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed = interactionSource.collectIsPressedAsState().value
     var isPressed2 by remember { mutableStateOf(false) }
+    var isEmailFormatCorrect by remember { mutableStateOf(false) }
 
+
+    LaunchedEffect(user?.email) {
+        isEmailFormatCorrect =
+            user?.email?.contains("@") == true && user?.email?.contains(
+                "."
+            ) == true
+    }
 
     LaunchedEffect(authStatus) {
         if (authStatus != Enums.ResponseStatus.Idle) {
             Toast.makeText(context, authStatus.message, Toast.LENGTH_SHORT).show()
+            if (authStatus == Enums.ResponseStatus.Success) {
+                navController.navigate(Screen.Form.withParams())
+            }
             dashboardViewModel.reset()
         }
     }
@@ -126,6 +137,7 @@ fun DashboardScreen(
             if (!isUserExisted)
                 Column {
                     CustomInput<String>(
+                        isDarkMode = true,
                         isEmail = true,
                         labelColor = WhiteTitle,
                         isRequired = true,
@@ -140,13 +152,12 @@ fun DashboardScreen(
                                 (user ?: User()).copy(nama = user?.nama, email = email)
                             )
                         },
-                        helperText = if (!user?.email.isNullOrEmpty() && user?.email?.contains("@") != true || !user?.email.isNullOrEmpty() && user?.email?.contains(
-                                "."
-                            ) != true
-                        ) stringResource(R.string.incorrect_email_format) else null,
+                        helperText = if (user?.email?.isNotEmpty() == true && !isEmailFormatCorrect)
+                            stringResource(R.string.incorrect_email_format) else null,
                     )
                     Spacer(Modifier.height(8.dp))
                     CustomInput<String>(
+                        isDarkMode = true,
                         imeAction = ImeAction.Done,
                         isRequired = true,
                         label = stringResource(R.string.name),
@@ -164,20 +175,18 @@ fun DashboardScreen(
                     )
                 }
             Button(
-                enabled = user != null,
+                enabled = user != null && !user?.email.isNullOrEmpty() && !user?.nama.isNullOrEmpty() && isEmailFormatCorrect,
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    navController.navigate(Screen.Form.route)
-                    if (!isUserExisted && user?.email?.contains("@") == true && user?.email?.contains(
-                            "."
-                        ) == true
-                    )
+                    if (!isUserExisted && isEmailFormatCorrect)
                         dashboardViewModel.signIn(context)
+                    else
+                        navController.navigate(Screen.Form.withParams())
                 },
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = if (isPressed) Color.White else Water,
-                    disabledContainerColor = Gray
+                    disabledContainerColor = IconBackgroundGray
                 ),
                 interactionSource = interactionSource,
             ) {

@@ -213,17 +213,6 @@ fun DeletedListScreen(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Water),
                 )
             },
-            floatingActionButton = {
-                FloatingActionButton(containerColor = BackgroundLight, onClick = {
-                    navController.navigate(Screen.Form.route)
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Add,
-                        contentDescription = stringResource(R.string.add_data_button),
-                        tint = BackgroundDark
-                    )
-                }
-            },
         ) {
             Column(
                 modifier = Modifier

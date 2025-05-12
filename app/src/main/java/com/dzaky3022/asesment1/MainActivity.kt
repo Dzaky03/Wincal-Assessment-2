@@ -7,6 +7,7 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +37,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dzaky3022.asesment1.database.AppDatabase
 import com.dzaky3022.asesment1.navigation.NavGraph
 import com.dzaky3022.asesment1.ui.theme.BackgroundDark
+import com.dzaky3022.asesment1.ui.theme.BackgroundLight
 import com.dzaky3022.asesment1.ui.theme.Water
+import com.dzaky3022.asesment1.ui.theme.WhiteTitle
 import com.dzaky3022.asesment1.ui.theme.WinCalTheme
 import com.dzaky3022.asesment1.utils.DataStore
 import com.dzaky3022.asesment1.utils.ViewModelFactory
@@ -89,9 +92,8 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (!isSplashOver) {
-                    // Simple splash screen
                     Column(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().background(BackgroundDark),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
@@ -114,7 +116,7 @@ class MainActivity : ComponentActivity() {
                         )
                         Text(
                             text = stringResource(R.string.initializing),
-                            color = BackgroundDark,
+                            color = WhiteTitle,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.SemiBold,
                         )

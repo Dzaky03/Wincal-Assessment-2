@@ -17,6 +17,7 @@ class ViewModelFactory(
     private val dataStore: DataStore? = null,
     private val userDao: UserDao? = null,
     private val waterResultDao: WaterResultDao? = null,
+    private val useFab: Boolean? = null,
 ) : ViewModelProvider.Factory {
     @Suppress("unchecked_cast")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -41,6 +42,7 @@ class ViewModelFactory(
                 localUser!!,
                 waterResultId,
                 waterResultDao!!,
+                useFab,
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
